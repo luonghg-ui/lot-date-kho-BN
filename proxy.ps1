@@ -1,7 +1,7 @@
 # WMS Proxy Server to bypass CORS for Google Sheets and Thuocsi API
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $port = 8081
-$sheetUrl = "https://docs.google.com/spreadsheets/d/10Oguigdpx5RWP4rV0Mw3eVdBrf-uS8ilQHKfA26GMw8/gviz/tq?tqx=out:csv&gid=0"
+$sheetUrl = "https://docs.google.com/spreadsheets/d/10Oguigdpx5RWP4rV0Mw3eVdBrf-uS8ilQHKfA26GMw8/export?format=csv&gid=0"
 $wmsUrl = "https://internal.thuocsi.vn/wms/BUYMED/HN/inventory/sku?group=BUYMED&warehouse=HN&isDraft=false"
 
 # Initial Tokens (Leave empty for security, enter in UI)

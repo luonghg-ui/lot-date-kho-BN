@@ -243,7 +243,8 @@ async function fetchSheetData() {
         }
 
         const firstLine = allRows[headerRowIndex];
-        const headerRow = firstLine.split(/","|",|,"|,/).map(c => c.replace(/^"|"$/g, '').trim().toUpperCase());
+        // Split by "," or ";" or CSV patterns
+        const headerRow = firstLine.split(/","|";"|",|,"|";|;"|,|;/).map(c => c.replace(/^"|"$/g, '').trim().toUpperCase());
         console.log("Headers detected at row " + headerRowIndex + ":", headerRow);
         
         const idx = {
@@ -260,8 +261,8 @@ async function fetchSheetData() {
         console.log("Column mapping indices:", idx);
         
         if (idx.sku === -1) {
-            const sample = firstLine.substring(0, 50).replace(/\n/g, ' ');
-            throw new Error(`Không tìm thấy cột 'SKU'. Dòng tiêu đề nhận được: "${sample}..."`);
+            const sample = firstLine.substring(0, 100).replace(/\n/g, ' ');
+            throw new Error(`Lỗi: Không tìm thấy cột SKU. Nội dung nhận được: "${sample}..."`);
         }
 
         const dataRows = allRows.slice(headerRowIndex + 1);
