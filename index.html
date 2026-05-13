@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS - Kiểm Kê Hàng Ngày</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50">
+    <div class="max-w-[1600px] mx-auto space-y-6">
+        <!-- Main Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Kiểm Kê Hàng Ngày</h1>
+                <p class="text-slate-500 text-sm">Theo dõi và quản lý tồn kho thực tế tại kho HN</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:block bg-white px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600">
+                    Thứ Sáu, 8 tháng 5, 2026
+                </div>
+                <div class="flex gap-2">
+                    <button id="btnOpenImport" class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600" title="Nhập dữ liệu">
+                        <i data-lucide="file-up" class="w-5 h-5"></i>
+                    </button>
+                    <button id="btnOpenSettings" class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600" title="Cài đặt Token">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                    <button id="btnSync" class="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600" title="Đồng bộ">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Summary Stats Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-indigo-100 text-indigo-600">
+                    <i data-lucide="package" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng SKU</p>
+                    <p id="statTotalSku" class="text-xl font-bold text-slate-900">-</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-emerald-100 text-emerald-600">
+                    <i data-lucide="check-square" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Đã Kiểm</p>
+                    <p id="statCounted" class="text-xl font-bold text-slate-900">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-amber-100 text-amber-600">
+                    <i data-lucide="boxes" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng SL Thực</p>
+                    <p id="statTotalQty" class="text-xl font-bold text-slate-900">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-rose-100 text-rose-600">
+                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lệch Kho</p>
+                    <p id="statDiscrepancy" class="text-xl font-bold text-slate-900">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Left Column: Search & Entry -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Search Card -->
+                <div class="glass-card p-6 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+                    <div class="relative group">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors w-5 h-5"></i>
+                        <input type="text" id="skuSearch" placeholder="Quét hoặc nhập SKU, Tên SP, Mã vị trí..." 
+                            class="w-full input-field pl-12 text-base shadow-sm border-slate-200" autocomplete="off">
+                        
+                        <!-- Suggestions Dropdown -->
+                        <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-2 overflow-hidden z-50">
+                            <!-- Items will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Detail & Form Column (Hidden by default) -->
+                <div id="entryContainer" class="hidden space-y-6 animate-fade-in">
+                    <!-- Product Info -->
+                    <div id="productCard" class="glass-card p-6 border-l-4 border-l-indigo-500 animate-fade-in">
+                        <div class="flex items-start justify-between mb-6">
+                            <div>
+                                <h2 id="pName" class="text-xl font-black text-slate-900 mb-1 leading-tight">Tên Sản Phẩm</h2>
+                                <p id="pSku" class="text-slate-500 font-mono text-xs uppercase">SKU: -</p>
+                            </div>
+                            <div class="flex gap-2">
+                                 <span id="pTypeBadge" class="badge badge-orange text-[10px] font-bold hidden">Thuốc</span>
+                                 <span id="pLocationBadge" class="badge badge-success text-[10px] font-bold hidden">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between gap-6">
+                            <div class="grid grid-cols-2 gap-6 flex-grow">
+                                <div>
+                                    <p class="info-label">Tồn Hệ Thống</p>
+                                    <div class="flex flex-col">
+                                        <span id="pSysQty" class="text-2xl font-bold text-slate-900 leading-none mb-1">0</span>
+                                        <span id="pUnit" class="text-[10px] font-medium text-slate-400 leading-tight">-</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="info-label">Lot Gần Nhất</p>
+                                    <p id="pLastLot" class="text-lg font-bold text-slate-400">-</p>
+                                </div>
+                            </div>
+                            <div id="pImageContainer" class="hidden">
+                                <img id="pMainImage" src="" alt="Sản phẩm" class="w-24 h-24 object-contain rounded-xl border border-slate-100 p-2 bg-white shadow-sm">
+                            </div>
+                        </div>
+
+                        <!-- Summary Small Badges -->
+                        <div class="grid grid-cols-3 gap-2 mt-6">
+                            <div class="p-2 bg-slate-50 rounded-lg text-center border border-slate-100">
+                                <p id="pAvailableQty" class="text-xs font-bold text-indigo-600">0</p>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Có sẵn</p>
+                            </div>
+                            <div class="p-2 bg-slate-50 rounded-lg text-center border border-slate-100">
+                                <p id="pHoldQty" class="text-xs font-bold text-amber-600">0</p>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Đang giữ</p>
+                            </div>
+                            <div class="p-2 bg-slate-50 rounded-lg text-center border border-slate-100">
+                                <p id="pShelfCount" class="text-xs font-bold text-slate-600">0</p>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Số Kệ</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Warehouse Info Tables -->
+                    <div class="space-y-4">
+                        <div class="glass-card overflow-hidden">
+                        <div class="px-4 py-3 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between cursor-pointer hover:bg-slate-100/50 transition"
+                             onclick="toggleSection('locationTableContent', 'locationEye')">
+                                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <i data-lucide="map-pin" class="w-3 h-3"></i> Vị trí kệ có hàng
+                                </h3>
+                                <div class="flex items-center gap-3">
+                                    <span id="pLocationCount" class="text-[10px] font-bold text-slate-400">0 vị trí</span>
+                                    <i id="locationEye" data-lucide="eye-off" class="w-4 h-4 text-slate-400"></i>
+                                </div>
+                            </div>
+                            <div id="locationTableContent" class="overflow-x-auto hidden">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50/30">
+                                        <tr>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider">Kệ</th>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider text-right">Tồn kho</th>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider text-right">Có sẵn</th>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider text-right">Giữ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="locationTableBody" class="divide-y divide-slate-50 text-[11px]">
+                                        <tr><td colspan="4" class="px-4 py-6 text-center text-slate-400 italic">Chọn sản phẩm để xem</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="glass-card overflow-hidden">
+                            <div class="px-4 py-3 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between cursor-pointer hover:bg-slate-100/50 transition"
+                                 onclick="toggleSection('lotTableContent', 'lotEye')">
+                                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <i data-lucide="calendar" class="w-3 h-3"></i> Lot / Hạn sử dụng
+                                </h3>
+                                <i id="lotEye" data-lucide="eye-off" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <div id="lotTableContent" class="overflow-x-auto hidden">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50/30">
+                                        <tr>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider">Lot</th>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider">HSD</th>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider text-right">Nhập</th>
+                                            <th class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider text-right">Có sẵn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lotTableBody" class="divide-y divide-slate-50 text-[11px]">
+                                        <tr><td colspan="4" class="px-4 py-6 text-center text-slate-400 italic">Chọn sản phẩm để xem</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry Form -->
+                    <div id="inventoryForm" class="glass-card p-6">
+                        <h3 class="text-sm font-bold text-slate-900 mb-6 flex items-center gap-2 uppercase tracking-wide">
+                            <i data-lucide="edit-3" class="w-4 h-4 text-indigo-500"></i>
+                            Nhập Kết Quả Kiểm Kê
+                        </h3>
+                        
+                        <form id="countForm" class="space-y-5">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Số Lot</label>
+                                    <input type="text" id="lotInput" required placeholder="VD: 240501" 
+                                        class="w-full input-field uppercase py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Hạn Dùng (EXP)</label>
+                                    <input type="date" id="dateInput" required 
+                                        class="w-full input-field py-2.5 text-sm">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Số Lượng Thực Tế</label>
+                                <input type="number" id="qtyInput" required min="1" placeholder="0" 
+                                    class="w-full input-field text-xl font-bold py-3">
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Ghi Chú (Tùy chọn)</label>
+                                <textarea id="noteInput" rows="2" placeholder="Thiếu hàng, móp hộp..." 
+                                    class="w-full input-field resize-none text-sm"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 pt-2">
+                                <button type="button" id="btnAddLot" class="btn-secondary text-sm">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    Thêm Lot
+                                </button>
+                                <button type="submit" class="btn-primary text-sm">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    Xong SKU
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Results List -->
+            <div class="lg:col-span-8">
+                <div class="glass-card flex flex-col min-h-[600px]">
+                    <div class="p-6 border-bottom border-slate-100 flex items-center justify-between border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                                <i data-lucide="list-checks" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Danh Sách Đã Kiểm</h3>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="btnCopy" class="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-100 transition" title="Copy">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                            <button id="btnExport" class="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-100 transition" title="Tải xuống">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </button>
+                            <button id="btnClear" class="p-2 bg-rose-50 border border-rose-100 rounded-lg text-rose-500 hover:bg-rose-100 transition" title="Xóa tất cả">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container flex-grow">
+                        <table id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/3">Sản Phẩm / SKU</th>
+                                    <th>Số Lot</th>
+                                    <th>Hạn Dùng</th>
+                                    <th class="text-center">Mã Vị Trí</th>
+                                    <th class="text-center">SL Thực</th>
+                                    <th class="text-center">Lệch</th>
+                                    <th class="w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryList">
+                                <!-- Items injected here -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="emptyState" class="py-24 text-center">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="package-search" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <p class="text-slate-400 font-medium">Chưa có dữ liệu kiểm kê</p>
+                            <p class="text-slate-300 text-xs mt-1">Quét SKU hoặc nhập tay để bắt đầu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[200] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl p-8 shadow-2xl animate-fade-in border border-slate-200">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                        <i data-lucide="file-up" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Nhập Dữ Liệu Sản Phẩm</h3>
+                </div>
+                <button id="btnCloseImport" class="text-slate-400 hover:text-slate-600 transition">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-6 flex gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-blue-500 shrink-0"></i>
+                <p class="text-blue-800 text-sm">
+                    Mở Google Sheet, chọn vùng dữ liệu rồi **Copy**, sau đó **Paste** vào ô dưới đây. Hệ thống sẽ tự động nhận diện cột.
+                </p>
+            </div>
+            
+            <textarea id="importArea" rows="8" placeholder="Dán dữ liệu từ Excel/Sheet vào đây..." 
+                class="w-full input-field font-mono text-xs mb-6 resize-none bg-slate-50 border-slate-200"></textarea>
+            
+            <div class="flex gap-4">
+                <button id="btnProcessImport" class="flex-grow btn-primary">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    Xác Nhận Nhập Dữ Liệu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[200] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-lg p-8 shadow-2xl animate-fade-in border border-slate-200">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                        <i data-lucide="key" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Cài Đặt Token</h3>
+                </div>
+                <button id="btnCloseSettings" class="text-slate-400 hover:text-slate-600 transition">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">SID Token</label>
+                    <textarea id="sidInput" rows="3" class="w-full input-field font-mono text-[10px] resize-none" placeholder="Nhập SID..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Session Token</label>
+                    <textarea id="tokenInput" rows="3" class="w-full input-field font-mono text-[10px] resize-none" placeholder="Nhập Session Token..."></textarea>
+                </div>
+                <button id="btnSaveSettings" class="w-full btn-primary mt-4">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Cập Nhật Token
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-white border border-slate-200 shadow-xl px-6 py-4 translate-y-20 opacity-0 transition-all duration-300 rounded-xl flex items-center gap-3 z-[100]">
+        <div id="toastIconBox" class="p-1.5 bg-emerald-50 rounded-lg text-emerald-600">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+        </div>
+        <span id="toastMsg" class="text-slate-700 font-semibold">Đã lưu thành công!</span>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.warn("Lucide failed to load icons", e);
+            }
+            
+            // Update date in header
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateEl = document.querySelector('.hidden.sm\\:block.bg-white');
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('vi-VN', options);
+        });
+
+        // Script fail fallback
+        setTimeout(() => {
+            const stat = document.getElementById('statTotalSku');
+            if (stat && stat.textContent === '-') {
+                console.error("Script.js failed to initialize properly");
+                const errorBox = document.createElement('div');
+                errorBox.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg z-[999] text-sm animate-bounce';
+                errorBox.innerHTML = 'Lỗi tải Script! Vui lòng nhấn Ctrl + F5 hoặc kiểm tra Console.';
+                document.body.appendChild(errorBox);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
