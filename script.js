@@ -204,12 +204,13 @@ async function fetchSheetData() {
         let response;
         try {
             console.log("Attempting sync via proxy...");
-            response = await fetch(PROXY_URL);
+            // Use cache-busting to avoid stale data on GitHub Pages
+            response = await fetch(`${PROXY_URL}?t=${Date.now()}`, { cache: 'no-store' });
             if (!response.ok) throw new Error("Proxy returned " + response.status);
         } catch (e) {
             console.warn("Proxy fetch failed, trying direct (might hit CORS)...", e);
             try {
-                response = await fetch(SHEET_URL);
+                response = await fetch(SHEET_URL, { cache: 'no-store' });
             } catch (e2) {
                 throw new Error("Không thể kết nối tới Proxy. Hãy đảm bảo file proxy.ps1 đang chạy!");
             }
@@ -217,6 +218,11 @@ async function fetchSheetData() {
 
         const csvText = await response.text();
         console.log("CSV Data received, length:", csvText.length);
+        console.log("CSV Sample (first 100 chars):", csvText.substring(0, 100));
+
+        if (!csvText || csvText.trim().length < 10) {
+            throw new Error("Dữ liệu nhận được trống hoặc quá ngắn.");
+        }
         
         // Remove BOM and split rows
         const cleanText = csvText.replace(/^\uFEFF/, '');
@@ -226,11 +232,19 @@ async function fetchSheetData() {
             throw new Error("File CSV không có dữ liệu hoặc chỉ có tiêu đề.");
         }
 
-        // Parse Header Row robustly
-        const firstLine = allRows[0];
-        // Split by "," or just , depending on format
+        // Try to find header row (it might not be the first row)
+        let headerRowIndex = 0;
+        for (let i = 0; i < Math.min(allRows.length, 5); i++) {
+            const rowUpper = allRows[i].toUpperCase();
+            if (rowUpper.includes('SKU') || rowUpper.includes('MÃ SKU')) {
+                headerRowIndex = i;
+                break;
+            }
+        }
+
+        const firstLine = allRows[headerRowIndex];
         const headerRow = firstLine.split(/","|",|,"|,/).map(c => c.replace(/^"|"$/g, '').trim().toUpperCase());
-        console.log("Headers detected:", headerRow);
+        console.log("Headers detected at row " + headerRowIndex + ":", headerRow);
         
         const idx = {
             sku: headerRow.findIndex(h => h.includes('SKU') || h === 'MÃ' || h.includes('MÃ SKU')),
@@ -244,11 +258,13 @@ async function fetchSheetData() {
             image: headerRow.findIndex(h => h.includes('HÌNH') || h.includes('IMAGE') || h.includes('ẢNH'))
         };
         console.log("Column mapping indices:", idx);
+        
         if (idx.sku === -1) {
-            throw new Error("Không tìm thấy cột 'SKU' hoặc 'MÃ SKU' trong file.");
+            const sample = firstLine.substring(0, 50).replace(/\n/g, ' ');
+            throw new Error(`Không tìm thấy cột 'SKU'. Dòng tiêu đề nhận được: "${sample}..."`);
         }
 
-        const dataRows = allRows.slice(1);
+        const dataRows = allRows.slice(headerRowIndex + 1);
         const newProducts = [];
         
         for (let i = 0; i < dataRows.length; i++) {
