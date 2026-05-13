@@ -63,39 +63,43 @@ try {
                 continue
             }
 
-            # --- Serve Local Files ---
-            if ($request.Url.AbsolutePath -eq "/" -or $request.Url.AbsolutePath -eq "/index.html") {
-                $filePath = Join-Path $PSScriptRoot "index.html"
-                if (Test-Path $filePath) {
-                    $content = [System.IO.File]::ReadAllBytes($filePath)
-                    $response.ContentType = "text/html; charset=utf-8"
-                    $response.OutputStream.Write($content, 0, $content.Length)
-                    $response.Close()
-                    continue
-                }
-            } elseif ($request.Url.AbsolutePath -eq "/script.js") {
-                $filePath = Join-Path $PSScriptRoot "script.js"
-                if (Test-Path $filePath) {
-                    $content = [System.IO.File]::ReadAllBytes($filePath)
-                    $response.ContentType = "application/javascript; charset=utf-8"
-                    $response.OutputStream.Write($content, 0, $content.Length)
-                    $response.Close()
-                    continue
-                }
-            } elseif ($request.Url.AbsolutePath -eq "/style.css") {
-                $filePath = Join-Path $PSScriptRoot "style.css"
-                if (Test-Path $filePath) {
-                    $content = [System.IO.File]::ReadAllBytes($filePath)
-                    $response.ContentType = "text/css; charset=utf-8"
-                    $response.OutputStream.Write($content, 0, $content.Length)
-                    $response.Close()
-                    continue
-                }
-            }
-
             # --- API Endpoints ---
             $isJson = $false
-            if ($request.Url.AbsolutePath -eq "/wms") {
+            if ($request.Url.AbsolutePath -eq "/csv") {
+                Write-Host "Fetching sheet CSV from Google..." -ForegroundColor Cyan
+                try {
+                    $userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                    
+                    # Try to fetch the file
+                    $response_google = Invoke-WebRequest -Uri $sheetUrl -UserAgent $userAgent -Method Get -TimeoutSec 30 -SessionVariable googleSession
+                    
+                    $content_google = $response_google.Content
+                    $html_google = [System.Text.Encoding]::UTF8.GetString($content_google)
+                    
+                    # Check if it's the "Virus Scan Warning" or "Download Anyway" page
+                    if ($html_google -like "*confirm=*" -and $html_google -like "*id=uc-download-link*") {
+                        Write-Host "Detected Google Drive large file warning. Attempting to bypass..." -ForegroundColor Yellow
+                        if ($html_google -match 'confirm=([a-zA-Z0-9_]+)') {
+                            $confirmCode = $matches[1]
+                            $downloadUrl = $sheetUrl + "&confirm=" + $confirmCode
+                            $response_google = Invoke-WebRequest -Uri $downloadUrl -UserAgent $userAgent -WebSession $googleSession -Method Get -TimeoutSec 30
+                            $content_google = $response_google.Content
+                        }
+                    }
+
+                    Write-Host "Download successful! Length: $($content_google.Length) bytes" -ForegroundColor Green
+                    $response.ContentType = "text/csv; charset=utf-8"
+                    $response.ContentLength64 = $content_google.Length
+                    $response.OutputStream.Write($content_google, 0, $content_google.Length)
+                    $response.Close()
+                    continue
+                } catch {
+                    Write-Host "Error fetching sheet: $($_.Exception.Message)" -ForegroundColor Red
+                    $response.StatusCode = 500
+                    $response.Close()
+                    continue
+                }
+            } elseif ($request.Url.AbsolutePath -eq "/wms") {
                 $targetUrl = $wmsUrl
                 $isJson = $true
             } elseif ($request.Url.AbsolutePath -eq "/wms/detail") {

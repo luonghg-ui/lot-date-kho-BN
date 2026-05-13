@@ -204,8 +204,8 @@ async function fetchSheetData() {
         let response;
         try {
             console.log("Attempting sync via proxy...");
-            // Use cache-busting to avoid stale data on GitHub Pages
-            response = await fetch(`${PROXY_URL}?t=${Date.now()}`, { cache: 'no-store' });
+            // Use /csv endpoint and cache-busting
+            response = await fetch(`${PROXY_URL}/csv?t=${Date.now()}`, { cache: 'no-store' });
             if (!response.ok) throw new Error("Proxy returned " + response.status);
         } catch (e) {
             console.warn("Proxy fetch failed, trying direct (might hit CORS)...", e);
