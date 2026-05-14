@@ -257,6 +257,9 @@
                             <h3 class="text-lg font-bold text-slate-900">Danh Sách Đã Kiểm</h3>
                         </div>
                         <div class="flex gap-2">
+                            <button id="btnSaveCloud" class="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-600 hover:bg-indigo-100 transition" title="Lưu vào Google Sheet">
+                                <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+                            </button>
                             <button id="btnCopy" class="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-100 transition" title="Copy">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
                             </button>
@@ -358,6 +361,10 @@
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Session Token</label>
                     <textarea id="tokenInput" rows="3" class="w-full input-field font-mono text-[10px] resize-none" placeholder="Nhập Session Token..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Google Script Web App URL</label>
+                    <input type="text" id="scriptUrlInput" class="w-full input-field text-xs" placeholder="https://script.google.com/macros/s/.../exec">
                 </div>
                 <button id="btnSaveSettings" class="w-full btn-primary mt-4">
                     <i data-lucide="save" class="w-5 h-5"></i>

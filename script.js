@@ -375,6 +375,7 @@ function setupEventListeners() {
     document.getElementById('btnAddLot').addEventListener('click', () => handleAddInventory(null, false));
     countForm.addEventListener('submit', (e) => handleAddInventory(e, true));
     btnSync.addEventListener('click', fetchAllData);
+    document.getElementById('btnSaveCloud').addEventListener('click', saveToSheet);
     document.getElementById('btnCopy').addEventListener('click', copyToClipboard);
     document.getElementById('btnExport').addEventListener('click', exportToCSV);
     document.getElementById('btnClear').addEventListener('click', clearInventory);
@@ -386,19 +387,26 @@ function setupEventListeners() {
         // Pre-fill with current tokens if stored in localStorage
         document.getElementById('sidInput').value = localStorage.getItem('wms_sid') || '';
         document.getElementById('tokenInput').value = localStorage.getItem('wms_token') || '';
+        document.getElementById('scriptUrlInput').value = localStorage.getItem('wms_script_url') || '';
     });
     document.getElementById('btnCloseSettings').addEventListener('click', () => settingsModal.classList.replace('flex', 'hidden'));
-    document.getElementById('btnSaveSettings').addEventListener('click', handleSaveTokens);
+    document.getElementById('btnSaveSettings').addEventListener('click', handleSaveSettings);
 }
 
-async function handleSaveTokens() {
+async function handleSaveSettings() {
     const sid = document.getElementById('sidInput').value.trim();
     const token = document.getElementById('tokenInput').value.trim();
+    const scriptUrl = document.getElementById('scriptUrlInput').value.trim();
 
     if (!sid || !token) {
         showToast("Vui lòng nhập đầy đủ SID và Token!", "warning");
         return;
     }
+
+    // Save locally
+    localStorage.setItem('wms_sid', sid);
+    localStorage.setItem('wms_token', token);
+    localStorage.setItem('wms_script_url', scriptUrl);
 
     try {
         const response = await fetch(UPDATE_TOKEN_URL, {
@@ -408,15 +416,14 @@ async function handleSaveTokens() {
         });
 
         if (response.ok) {
-            localStorage.setItem('wms_sid', sid);
-            localStorage.setItem('wms_token', token);
-            showToast("Đã cập nhật Token thành công!");
-            document.getElementById('settingsModal').classList.replace('flex', 'hidden');
+            showToast("Đã cập nhật cài đặt thành công!");
+            document.getElementById('settingsModal').classList.replace('hidden', 'flex');
         } else {
             throw new Error("Proxy không phản hồi đúng.");
         }
     } catch (e) {
-        showToast("Lỗi khi cập nhật Token: " + e.message, "warning");
+        showToast("Đã lưu cục bộ, nhưng lỗi proxy: " + e.message, "warning");
+        document.getElementById('settingsModal').classList.replace('hidden', 'flex');
     }
 }
 
@@ -900,6 +907,49 @@ function exportToCSV() {
     link.click();
     document.body.removeChild(link);
     showToast("Đã xuất file CSV!");
+}
+
+async function saveToSheet() {
+    if (inventory.length === 0) {
+        showToast("Chưa có dữ liệu để lưu!", "warning");
+        return;
+    }
+
+    const scriptUrl = localStorage.getItem('wms_script_url');
+    if (!scriptUrl) {
+        showToast("Vui lòng cài đặt URL Google Script trong phần Cài đặt!", "warning");
+        document.getElementById('settingsModal').classList.replace('hidden', 'flex');
+        return;
+    }
+
+    const btn = document.getElementById('btnSaveCloud');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i>';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors', // Apps Script web app requires no-cors if not handling OPTIONS
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ items: inventory })
+        });
+
+        // Note: With no-cors, we can't actually see the response body or status properly
+        // but if it didn't throw, it likely reached the script.
+        showToast("Đã gửi dữ liệu tới Google Sheet!");
+    } catch (e) {
+        console.error("Save to Sheet Error:", e);
+        showToast("Lỗi khi lưu: " + e.message, "warning");
+    } finally {
+        btn.innerHTML = originalHtml;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        btn.disabled = false;
+    }
 }
 
 function showToast(msg, type = "success") {
