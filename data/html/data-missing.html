@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Missing – Tính Lệch Tồn Kho</title>
+    <meta name="description" content="Tính gap missing giữa dữ liệu hệ thống và số lượng đã kiểm kê thực tế.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <style>
+        :root { --primary: #6366F1; --primary-glow: rgba(99,102,241,0.4); --accent: #06B6D4; --bg-dark: #030712; --surface: rgba(30,41,59,0.6); --surface-glass: rgba(30,41,59,0.4); --surface2: rgba(15,23,42,0.8); --border: rgba(255,255,255,0.08); --border-glow: rgba(99,102,241,0.15); --text: #F8FAFC; --text-muted: #94A3B8; --text-dim: #64748B; --radius-xl: 24px; --radius-lg: 18px; --font-display: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif; --bot-msg-bg: rgba(30,41,59,0.5); }
+        [data-theme="light"] {
+            --primary: #4F46E5;
+            --primary-glow: rgba(79, 70, 229, 0.3);
+            --accent: #0891B2;
+            --bg-dark: #FFFFFF;
+            --surface: rgba(255, 255, 255, 0.85);
+            --surface-glass: rgba(255, 255, 255, 0.65);
+            --surface2: rgba(226, 232, 240, 0.7);
+            --border: rgba(0, 0, 0, 0.12);
+            --border-glow: rgba(79, 70, 229, 0.15);
+            --text: #0F172A;
+            --text-muted: #475569;
+            --text-dim: #94A3B8;
+            --bot-msg-bg: rgba(255, 255, 255, 0.85);
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+        @keyframes shimmer { 0% { background-position:-400px 0; } 100% { background-position:400px 0; } }
+        @keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+        .gap-summary-bar {
+            display: flex;
+            height: 6px;
+            border-radius: 100px;
+            overflow: hidden;
+            margin: 16px 0 20px;
+            background: rgba(255,255,255,0.04);
+        }
+        [data-theme="light"] .gap-summary-bar { background: rgba(0,0,0,0.06); }
+        .gap-summary-bar .seg { height: 100%; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+        .gap-summary-bar .seg.ok { background: linear-gradient(90deg, #059669, #34D399); }
+        .gap-summary-bar .seg.missing { background: linear-gradient(90deg, #DC2626, #F87171); }
+        .gap-summary-bar .seg.surplus { background: linear-gradient(90deg, #D97706, #FCD34D); }
+
+        .gap-legend {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .gap-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .gap-legend-item .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .gap-legend-item .dot.ok { background: #34D399; }
+        .gap-legend-item .dot.missing { background: #F87171; }
+        .gap-legend-item .dot.surplus { background: #FCD34D; }
+
+        .stat-card .stat-value { animation: countUp 0.6s ease-out forwards; }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 8px 18px;
+            border-radius: 100px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-chip:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        [data-theme="light"] .filter-chip:hover { background: rgba(0,0,0,0.05); color: var(--text); }
+        .filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 15px var(--primary-glow); }
+        .filter-chip.active.ok { background: #059669; border-color: #059669; box-shadow: 0 4px 15px rgba(5,150,105,0.3); }
+        .filter-chip.active.diff { background: #D97706; border-color: #D97706; box-shadow: 0 4px 15px rgba(217,119,6,0.3); }
+        .filter-chip.active.missing { background: #DC2626; border-color: #DC2626; box-shadow: 0 4px 15px rgba(220,38,38,0.3); }
+        .filter-chip.active.surplus { background: #D97706; border-color: #D97706; box-shadow: 0 4px 15px rgba(217,119,6,0.3); }
+
+        .pagination-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+        .page-info { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .page-btns { display: flex; gap: 6px; }
+        .page-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.25s;
+        }
+        .page-btn:hover:not(:disabled):not(.active) { background: rgba(255,255,255,0.08); color: #fff; }
+        [data-theme="light"] .page-btn:hover:not(:disabled):not(.active) { background: rgba(0,0,0,0.04); color: var(--text); }
+        .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-glow); }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        tbody tr {
+            transition: all 0.25s;
+            animation: fadeIn 0.35s ease-out forwards;
+            opacity: 0;
+        }
+        tbody tr[data-idx] { cursor: pointer; }
+        tbody tr:hover { background: rgba(99,102,241,0.06) !important; }
+        tbody tr:active { background: rgba(99,102,241,0.1) !important; }
+
+        .skeleton-row td {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .stat-card .stat-icon { transition: transform 0.4s, box-shadow 0.4s; }
+        .stat-card:hover .stat-icon { transform: scale(1.1) rotate(5deg); }
+
+        #statusBanner {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .gap-legend { gap: 12px; }
+            .filter-chips { gap: 4px; }
+            .filter-chip { padding: 6px 12px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mesh-bg"></div>
+
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-icon"><i class='bx bx-radar'></i></div>
+            <div class="brand-text">
+                <h1>Data Missing Tính Lệch</h1>
+                <p>Khớp dữ liệu theo thời gian thực</p>
+            </div>
+        </div>
+        <nav class="header-nav">
+            <a href="index.html" class="nav-link">
+                <i class='bx bx-bot'></i>
+                <span>Trợ Lý AI</span>
+            </a>
+            <a href="data-pa.html" class="nav-link">
+                <i class='bx bx-table'></i>
+                <span>Data PA</span>
+            </a>
+            <a href="data-missing.html" class="nav-link active">
+                <i class='bx bx-data'></i>
+                <span>Missing</span>
+            </a>
+            <a href="doisoat.html" class="nav-link">
+                <i class='bx bx-shield-quarter'></i>
+                <span>Đối Soát</span>
+            </a>
+            <a href="../../WH-WMS/mapping.html" class="nav-link">
+                <i class='bx bx-building-house'></i>
+                <span>WMS</span>
+            </a>
+            <a href="../WH-main/buymed-search.html" class="nav-link">
+                <i class='bx bx-search-alt-2'></i>
+                <span>Tra cứu nhanh</span>
+            </a>
+            <button class="btn-export-global" id="exportBtn">
+                <i class='bx bxs-file-export'></i>
+                <span>Xuất Excel</span>
+            </button>
+            <button class="btn-refresh" id="refreshBtn">
+                <i class='bx bx-refresh'></i>
+                <span>Làm mới tính toán</span>
+            </button>
+            <button class="btn-theme" id="themeToggle" title="Chuyển đổi giao diện sáng/tối">
+                <i class='bx bx-moon' id="themeIcon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div class="page-wrapper">
+        <div class="stats-row">
+            <div class="stat-card" onclick="openCatModal('all')" style="cursor:pointer;">
+                <div class="stat-icon blue"><i class='bx bx-collection'></i></div>
+                <div class="stat-label">Tổng Mã SKU</div>
+                <div class="stat-value" id="statTotalSKU">—</div>
+            </div>
+            <div class="stat-card" onclick="openCatModal('ok')" style="cursor:pointer;">
+                <div class="stat-icon green"><i class='bx bx-check-shield'></i></div>
+                <div class="stat-label">SKU Khớp Hoàn Toàn</div>
+                <div class="stat-value" id="statMatched">—</div>
+            </div>
+            <div class="stat-card" onclick="openCatModal('missing')" style="cursor:pointer;">
+                <div class="stat-icon red"><i class='bx bx-layer-minus'></i></div>
+                <div class="stat-label">SKU Thiếu (Missing)</div>
+                <div class="stat-value" id="statMissing">—</div>
+            </div>
+            <div class="stat-card" onclick="openCatModal('not_out')" style="cursor:pointer;">
+                <div class="stat-icon yellow"><i class='bx bx-layer-plus'></i></div>
+                <div class="stat-label">SKU Tìm Thấy Chưa Kiểm</div>
+                <div class="stat-value" id="statNotOut">—</div>
+            </div>
+        </div>
+
+        <div class="gap-legend" id="gapLegend" style="display:none;">
+            <span class="gap-legend-item"><span class="dot ok"></span> Khớp</span>
+            <span class="gap-legend-item"><span class="dot missing"></span> Thiếu</span>
+            <span class="gap-legend-item"><span class="dot surplus"></span> Dư</span>
+        </div>
+        <div class="gap-summary-bar" id="gapSummaryBar" style="display:none;">
+            <div class="seg ok" id="segOk" style="width:0%"></div>
+            <div class="seg missing" id="segMissing" style="width:0%"></div>
+            <div class="seg surplus" id="segSurplus" style="width:0%"></div>
+        </div>
+
+        <div id="statusBanner" style="display:none;">
+            <div class="banner loading" id="bannerInner">
+                <i class='bx bx-loader-alt bx-spin'></i>
+                <span>Đang phân tích số liệu chênh lệch...</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-wrap">
+                <i class='bx bx-search'></i>
+                <input type="text" id="searchInput" placeholder="Tìm theo SKU hoặc tên sản phẩm..." disabled>
+            </div>
+            <select class="filter-select" id="gapFilter" disabled style="display:none;">
+                <option value="all">Tất cả</option>
+                <option value="diff">Lệch</option>
+                <option value="missing">Thiếu</option>
+                <option value="surplus">Dư</option>
+                <option value="ok">Khớp</option>
+            </select>
+            <div class="filter-chips" id="filterChips">
+                <span class="filter-chip active" data-value="all">Tất cả</span>
+                <span class="filter-chip diff" data-value="diff">Chênh lệch</span>
+                <span class="filter-chip missing" data-value="missing">Thiếu</span>
+                <span class="filter-chip surplus" data-value="surplus">Dư</span>
+                <span class="filter-chip ok" data-value="ok">Khớp</span>
+            </div>
+            <div class="result-badge" id="resultBadge">Sẵn sàng</div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th style="width:50px; text-align:center;">#</th>
+                            <th style="width:60px;"></th>
+                            <th data-col="name" id="thName">Sản phẩm / SKU <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th data-col="sys" id="thSys">Cần Kiểm <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th data-col="act" id="thAct">Đã Kiểm <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th data-col="gap" id="thGap">Chưa Kiểm <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th class="th-vertical">Tìm thấy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr class="skeleton-row"><td colspan="7" style="padding:100px; text-align:center; color:var(--text-dim);">Đang tải và tính toán... Vui lòng thêm cột "Đã kiểm" hoặc "Thực tế" vào Sheet nếu chưa có!</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrap" id="paginationWrap" style="display:none;">
+                <div class="page-info" id="pageInfo"></div>
+                <div class="page-btns" id="pageBtns"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <button class="modal-close" id="modalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- CATEGORY MODAL -->
+    <div class="modal-overlay" id="catModalOverlay">
+        <div class="modal-box" id="catModalBox" style="max-width: 900px;">
+            <button class="modal-close" id="catModalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-header" style="flex-direction: column; align-items: stretch; padding-bottom: 24px;" id="catModalHeader"></div>
+            <div class="modal-body" id="catModalBody" style="padding: 0;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sync filter chips with the hidden select (for JS compatibility)
+        document.addEventListener('DOMContentLoaded', () => {
+            const chips = document.querySelectorAll('.filter-chip');
+            const select = document.getElementById('gapFilter');
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    chips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    select.value = chip.dataset.value;
+                    select.dispatchEvent(new Event('change'));
+                });
+            });
+        });
+    </script>
+    <script>
+    (function() {
+        var theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.className = theme === 'dark' ? 'bx bx-moon' : 'bx bx-sun';
+        var btn = document.getElementById('themeToggle');
+        if (btn) btn.addEventListener('click', function() {
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            if (icon) icon.className = next === 'dark' ? 'bx bx-moon' : 'bx bx-sun';
+        });
+    })();
+    </script>
+    <script src="../assets/js/script-missing.js"></script>
+</body>
+
+</html>

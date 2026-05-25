@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trợ Lý Kho Hàng Thuocsi</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Boxicons for icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body class="chatbot-page">
+    <div class="mesh-bg"></div>
+    <div class="chatbot-container">
+        <header class="chat-header">
+            <div class="brand">
+                <div class="brand-icon"><i class='bx bx-bot'></i></div>
+                <div class="brand-text">
+                    <h1>Trợ Lý Kho Hàng</h1>
+                    <p>Sẵn sàng hỗ trợ tra cứu</p>
+                </div>
+            </div>
+            
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link active">
+                    <i class='bx bx-chat'></i>
+                    <span>Trợ Lý</span>
+                </a>
+                <a href="data-pa.html" class="nav-link">
+                    <i class='bx bx-table'></i>
+                    <span>PA</span>
+                </a>
+                <a href="data-missing.html" class="nav-link">
+                    <i class='bx bx-data'></i>
+                    <span>Missing</span>
+                </a>
+                <a href="doisoat.html" class="nav-link">
+                    <i class='bx bx-shield-quarter'></i>
+                    <span>Đối Soát</span>
+                </a>
+                <a href="../../WH-WMS/mapping.html" class="nav-link">
+                    <i class='bx bx-building-house'></i>
+                    <span>WMS</span>
+                </a>
+                <a href="../../mapping.html" class="nav-link">
+                    <i class='bx bx-map-alt'></i>
+                    <span>Map Kệ</span>
+                </a>
+                <a href="../WH-main/buymed-search.html" class="nav-link" style="color: var(--primary); border-color: var(--primary-glow);">
+                    <i class='bx bx-search-alt-2'></i>
+                    <span>Tra cứu nhanh</span>
+                </a>
+                <button class="btn-sync" id="syncDataBtn" title="Đồng bộ dữ liệu từ hệ thống">
+                    <i class='bx bx-sync'></i>
+                    <span>Cập nhật</span>
+                </button>
+                <button class="btn-refresh-mini" id="refreshDataBtn" title="Tải lại dữ liệu">
+                    <i class='bx bx-refresh'></i>
+                </button>
+                <button class="btn-theme" id="themeToggle" title="Chuyển đổi giao diện sáng/tối">
+                    <i class='bx bx-moon' id="themeIcon"></i>
+                </button>
+            </nav>
+        </header>
+
+        <main class="chat-body" id="chatBody">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p>Xin chào! Dữ liệu đang được tải về từ hệ thống...</p>
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="chat-footer">
+            <form id="chatForm" autocomplete="off">
+                <div class="input-container">
+                    <i class='bx bx-search search-icon'></i>
+                    <input type="text" id="userInput" placeholder="Nhập MÃ SKU hoặc Tên sản phẩm..." disabled>
+                    <button type="submit" id="sendBtn" class="send-btn" disabled>
+                        <i class='bx bx-send'></i>
+                    </button>
+                </div>
+            </form>
+        </footer>
+    </div>
+    <script src="../assets/js/script-sync.js"></script>
+    <script src="../assets/js/script.js"></script>
+    <div id="statusBanner" style="display:none;">
+        <div class="banner loading" id="bannerInner">
+            <i class='bx bx-loader-alt bx-spin'></i>
+            <span>Đang xử lý...</span>
+        </div>
+    </div>
+    <script>
+    (function() {
+        var theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.className = theme === 'dark' ? 'bx bx-moon' : 'bx bx-sun';
+        var btn = document.getElementById('themeToggle');
+        if (btn) btn.addEventListener('click', function() {
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            if (icon) icon.className = next === 'dark' ? 'bx bx-moon' : 'bx bx-sun';
+        });
+    })();
+    </script>
+</body>
+
+</html>
