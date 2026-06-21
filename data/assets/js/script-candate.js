@@ -354,9 +354,17 @@ function exportToTemplate() {
     if (!dataToExport.length) { alert('Không có dữ liệu!'); return; }
     try {
         const rows = dataToExport.map((d, i) => ({
-            STT: i + 1, 'Mã SKU': d.sku, 'Tên Sản Phẩm': d.name,
-            'Vị Trí': d.location || '-', 'Tồn HT': d.qty, 'Lot HT': d.lot || '-', 'HSD HT': d.expDate || '-',
-            'Lot Thực Tế': '', 'HSD Thực Tế': '', 'SL Thực Tế': '', 'Ghi Chú': ''
+            'STT': i + 1,
+            'Line Id': '',
+            'Mã SKU': d.sku,
+            'Mã vị trí': d.location || '-',
+            'Mã phiếu kiểm': '',
+            'Lô': d.lot || '-',
+            'HSD': d.expDate || '-',
+            'Vat': '',
+            'Số lượng': d.qty,
+            'Trạng thái': 'Chờ đồng bộ',
+            'Chốt lần kiểm': ''
         }));
         const ws = XLSX.utils.json_to_sheet(rows);
         const wb = XLSX.utils.book_new();
@@ -368,12 +376,24 @@ function exportToTemplate() {
             for (let C = range.s.c; C <= range.e.c; ++C) {
                 const ref = XLSX.utils.encode_cell({ r: R, c: C });
                 if (ws[ref]) {
-                    ws[ref].s = { border: { top: { style: 'thin', color: { rgb: 'E2E8F0' } }, bottom: { style: 'thin', color: { rgb: 'E2E8F0' } }, left: { style: 'thin', color: { rgb: 'E2E8F0' } }, right: { style: 'thin', color: { rgb: 'E2E8F0' } } } };
+                    ws[ref].s = { border: { top: { style: 'thin', color: { rgb: 'E2E8F0' } }, bottom: { style: 'thin', color: { rgb: 'E2E8F0' } }, left: { style: 'thin', color: { rgb: 'E2E8F0' } }, right: { style: 'thin', color: { rgb: 'E2E8F0' } } }, alignment: { vertical: 'center' } };
                     if (R === 0) ws[ref].s = { ...ws[ref].s, ...headerStyle };
                 }
             }
         }
-        ws['!cols'] = [{ wch: 6 }, { wch: 25 }, { wch: 50 }, { wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 14 }, { wch: 15 }, { wch: 14 }, { wch: 12 }, { wch: 20 }];
+        ws['!cols'] = [
+            { wch: 6 },  // STT
+            { wch: 15 }, // Line Id
+            { wch: 25 }, // Mã SKU
+            { wch: 15 }, // Mã vị trí
+            { wch: 25 }, // Mã phiếu kiểm
+            { wch: 15 }, // Lô
+            { wch: 15 }, // HSD
+            { wch: 10 }, // Vat
+            { wch: 12 }, // Số lượng
+            { wch: 18 }, // Trạng thái
+            { wch: 20 }  // Chốt lần kiểm
+        ];
         const d = new Date();
         XLSX.writeFile(wb, `Mau_Kiem_Ke_Date_${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}.xlsx`);
     } catch (err) { alert('Lỗi xuất Mẫu kiểm kê: ' + err.message); }
