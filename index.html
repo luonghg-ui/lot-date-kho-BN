@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS - Kiểm Kê Hàng Ngày</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="settings.js"></script>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+<body>
+    <div class="max-w-[1600px] mx-auto space-y-5">
+        <!-- Main Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-3 animate-fade-in">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="package" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-900 dark:text-white">Kiểm Kê Hàng Ngày</h1>
+                    <p class="text-slate-500 dark:text-slate-300 text-xs font-medium">Theo dõi và quản lý tồn kho thực tế tại kho HN</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                <div class="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-500 dark:text-slate-300 shadow-sm">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span id="currentDate">Đang tải...</span>
+                </div>
+
+                <button id="themeToggle" class="p-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400" title="Chế độ tối/sáng">
+                    <i data-lucide="moon" class="w-4 h-4"></i>
+                </button>
+                <button id="btnOpenImport" class="p-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400" title="Nhập dữ liệu">
+                    <i data-lucide="file-up" class="w-4 h-4"></i>
+                </button>
+                <button id="btnOpenSettings" class="p-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400" title="Cài đặt Token">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+                <button id="btnPageNav" onclick="openPageNavigator()" class="p-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all text-slate-500 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400" title="Tất cả trang">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </button>
+                <button id="btnSync" class="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 border-0 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all text-white shadow-lg shadow-indigo-500/20" title="Đồng bộ">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary Stats Row -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 animate-fade-in">
+            <div class="stat-card">
+                <div class="stat-icon bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Tổng SKU</p>
+                    <p id="statTotalSku" class="text-xl font-bold text-slate-900 dark:text-white">-</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                    <i data-lucide="check-square" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Đã Kiểm</p>
+                    <p id="statCounted" class="text-xl font-bold text-slate-900 dark:text-white">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                    <i data-lucide="boxes" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Tổng SL Thực</p>
+                    <p id="statTotalQty" class="text-xl font-bold text-slate-900 dark:text-white">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Lệch Kho</p>
+                    <p id="statDiscrepancy" class="text-xl font-bold text-slate-900 dark:text-white">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Left Column: Search & Entry -->
+            <div class="lg:col-span-4 space-y-5">
+                <!-- Search Card -->
+                <div class="glass-card p-5 focus-within:ring-2 focus-within:ring-indigo-200 dark:focus-within:ring-indigo-800 transition-all animate-fade-in">
+                    <div class="relative group">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 group-focus-within:text-indigo-500 transition-colors w-4 h-4"></i>
+                        <input type="text" id="skuSearch" placeholder="Quét hoặc nhập SKU, Tên SP, Mã vị trí..."
+                            class="w-full input-field pl-11 text-sm shadow-sm border-slate-200 dark:border-slate-700" autocomplete="off">
+
+                        <!-- Suggestions Dropdown -->
+                        <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-2 overflow-hidden z-50">
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 dark:text-slate-400 mt-2 flex items-center gap-1.5">
+                        <i data-lucide="keyboard" class="w-3 h-3"></i>
+                        Gõ để tìm kiếm · <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[9px] font-mono">Enter</kbd> chọn
+                    </p>
+                </div>
+
+                <!-- Product Detail & Form Column -->
+                <div id="entryContainer" class="hidden space-y-4">
+                    <!-- Product Info -->
+                    <div id="productCard" class="glass-card p-5 border-l-[3px] border-l-indigo-500 animate-scale-in">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="min-w-0 flex-1">
+                                <h2 id="pName" class="text-lg font-extrabold text-slate-900 dark:text-white mb-1 leading-tight truncate">Tên Sản Phẩm</h2>
+                                <p id="pSku" class="text-slate-500 dark:text-slate-300 font-mono text-[11px] uppercase truncate">SKU: -</p>
+                            </div>
+                            <div class="flex gap-1.5 flex-shrink-0 ml-2">
+                                <span id="pTypeBadge" class="badge badge-orange text-[9px] font-bold hidden">Thuốc</span>
+                                <span id="pLocationBadge" class="badge badge-success text-[9px] font-bold hidden">-</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="grid grid-cols-2 gap-4 flex-1">
+                                <div>
+                                    <p class="info-label">Tồn Hệ Thống</p>
+                                    <div class="flex flex-col">
+                                        <span id="pSysQty" class="text-2xl font-extrabold text-slate-900 dark:text-white leading-none mb-0.5">0</span>
+                                        <span id="pUnit" class="text-[10px] font-medium text-slate-400 dark:text-slate-400">-</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="info-label">Lot Gần Nhất</p>
+                                    <p id="pLastLot" class="text-base font-bold text-slate-500 dark:text-slate-300">-</p>
+                                </div>
+                            </div>
+                            <div id="pImageContainer" class="hidden flex-shrink-0">
+                                <div class="w-20 h-20 rounded-xl border border-slate-200 dark:border-slate-700 p-1.5 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+                                    <img id="pMainImage" src="" alt="Sản phẩm" class="w-full h-full object-contain product-img-zoom">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Badges Row -->
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center border border-slate-100 dark:border-slate-700/50">
+                                <p id="pAvailableQty" class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">0</p>
+                                <p class="text-[7px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-tighter">Có sẵn</p>
+                            </div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center border border-slate-100 dark:border-slate-700/50">
+                                <p id="pHoldQty" class="text-xs font-extrabold text-amber-600 dark:text-amber-400">0</p>
+                                <p class="text-[7px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-tighter">Đang giữ</p>
+                            </div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center border border-slate-100 dark:border-slate-700/50">
+                                <p id="pShelfCount" class="text-xs font-extrabold text-slate-600 dark:text-slate-300">0</p>
+                                <p class="text-[7px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-tighter">Số Kệ</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Warehouse Info -->
+                    <div class="space-y-3">
+                        <div class="glass-card overflow-hidden">
+                            <div class="px-4 py-3 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between cursor-pointer hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all"
+                                 onclick="toggleSection('locationTableContent', 'locationEye')">
+                                <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                    <i data-lucide="map-pin" class="w-3 h-3"></i> Vị trí kệ có hàng
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <span id="pLocationCount" class="text-[10px] font-bold text-slate-400 dark:text-slate-400">0 vị trí</span>
+                                    <i id="locationEye" data-lucide="eye-off" class="w-3.5 h-3.5 text-slate-400 dark:text-slate-400"></i>
+                                </div>
+                            </div>
+                            <div id="locationTableContent" class="overflow-x-auto hidden">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50/30 dark:bg-slate-800/20">
+                                        <tr>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Kệ</th>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider text-right">Tồn kho</th>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider text-right">Có sẵn</th>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider text-right">Giữ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="locationTableBody" class="divide-y divide-slate-50 dark:divide-slate-800/30 text-[11px]">
+                                        <tr><td colspan="4" class="px-4 py-6 text-center text-slate-400 dark:text-slate-400 italic">Chọn sản phẩm để xem</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="glass-card overflow-hidden">
+                            <div class="px-4 py-3 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between cursor-pointer hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all"
+                                 onclick="toggleSection('lotTableContent', 'lotEye')">
+                                <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                    <i data-lucide="calendar" class="w-3 h-3"></i> Lot / Hạn sử dụng
+                                </h3>
+                                <i id="lotEye" data-lucide="eye-off" class="w-3.5 h-3.5 text-slate-400 dark:text-slate-400"></i>
+                            </div>
+                            <div id="lotTableContent" class="overflow-x-auto hidden">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50/30 dark:bg-slate-800/20">
+                                        <tr>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Lot</th>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">HSD</th>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider text-right">Nhập</th>
+                                            <th class="px-4 py-2 text-[8px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider text-right">Có sẵn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lotTableBody" class="divide-y divide-slate-50 dark:divide-slate-800/30 text-[11px]">
+                                        <tr><td colspan="4" class="px-4 py-6 text-center text-slate-400 dark:text-slate-400 italic">Chọn sản phẩm để xem</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry Form -->
+                    <div id="inventoryForm" class="glass-card p-5 animate-fade-in">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
+                            <i data-lucide="edit-3" class="w-4 h-4 text-indigo-500"></i>
+                            Nhập Kết Quả Kiểm Kê
+                        </h3>
+
+                        <form id="countForm" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-1.5">Số Lot</label>
+                                    <input type="text" id="lotInput" required placeholder="VD: 240501"
+                                        class="w-full input-field uppercase py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-1.5">Hạn Dùng (EXP)</label>
+                                    <input type="date" id="dateInput" required
+                                        class="w-full input-field py-2.5 text-sm">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-1.5">Số Lượng Thực Tế</label>
+                                <input type="number" id="qtyInput" required min="1" placeholder="0"
+                                    class="w-full input-field text-xl font-bold py-3">
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-1.5">Ghi Chú (Tùy chọn)</label>
+                                <textarea id="noteInput" rows="2" placeholder="Thiếu hàng, móp hộp..."
+                                    class="w-full input-field resize-none text-sm"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 pt-1">
+                                <button type="button" id="btnAddLot" class="btn-secondary text-sm">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    Thêm Lot
+                                </button>
+                                <button type="submit" class="btn-primary text-sm">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    Xong SKU
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Results List -->
+            <div class="lg:col-span-8 animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="glass-card flex flex-col min-h-[500px]">
+                    <div class="p-5 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                <i data-lucide="list-checks" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white">Danh Sách Đã Kiểm</h3>
+                            <span id="countedBadge" class="badge badge-indigo text-[9px]">0</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button id="btnSaveCloud" class="p-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all" title="Lưu vào Google Sheet">
+                                <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+                            </button>
+                            <button id="btnCopy" class="p-2 bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all" title="Copy">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                            <button id="btnExport" class="p-2 bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all" title="Tải xuống">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </button>
+                            <button id="btnClear" class="p-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-lg text-rose-500 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all" title="Xóa tất cả">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container flex-grow">
+                        <table id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th class="w-[30%]">Sản Phẩm / SKU</th>
+                                    <th>Số Lot</th>
+                                    <th>Hạn Dùng</th>
+                                    <th class="text-center">Mã Vị Trí</th>
+                                    <th class="text-center">Có sẵn</th>
+                                    <th class="text-center">Đang giữ</th>
+                                    <th class="text-center">Tồn hệ thống</th>
+                                    <th class="text-center">Thực</th>
+                                    <th class="text-center">Lệch</th>
+                                    <th class="w-12"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryList">
+                            </tbody>
+                        </table>
+
+                        <!-- Empty State -->
+                        <div id="emptyState" class="py-20 text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 flex items-center justify-center border border-indigo-100 dark:border-indigo-800/30">
+                                <i data-lucide="package-search" class="w-7 h-7 text-indigo-400 dark:text-indigo-500"></i>
+                            </div>
+                            <p class="text-slate-500 dark:text-slate-300 font-semibold">Chưa có dữ liệu kiểm kê</p>
+                            <p class="text-slate-400 dark:text-slate-400 text-xs mt-1">Quét SKU hoặc nhập tay để bắt đầu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="fixed inset-0 modal-overlay z-[200] hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl p-6 md:p-8 shadow-2xl modal-content border border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                        <i data-lucide="file-up" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Nhập Dữ Liệu Sản Phẩm</h3>
+                </div>
+                <button id="btnCloseImport" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center justify-center">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 p-4 rounded-xl mb-5 flex gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+                <p class="text-blue-800 dark:text-blue-300 text-sm">Mở Google Sheet, chọn vùng dữ liệu rồi <strong>Copy</strong>, sau đó <strong>Paste</strong> vào ô dưới đây.</p>
+            </div>
+
+            <textarea id="importArea" rows="8" placeholder="Dán dữ liệu từ Excel/Sheet vào đây..."
+                class="w-full input-field font-mono text-xs mb-5 resize-none bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700"></textarea>
+
+            <button id="btnProcessImport" class="w-full btn-primary">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                Xác Nhận Nhập Dữ Liệu
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ══ PAGE NAVIGATOR MODAL ══ -->
+    <div id="pageNavModal" class="fixed inset-0 z-[300] hidden items-center justify-center p-4" style="background:rgba(2,6,23,0.75); backdrop-filter:blur(20px);">
+        <div id="pageNavBox" class="w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl" style="background:linear-gradient(145deg,rgba(30,41,59,0.95),rgba(15,23,42,0.98)); border:1px solid rgba(255,255,255,0.1); transform:scale(0.9) translateY(20px); transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+            <!-- Header -->
+            <div style="padding:28px 28px 20px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg,#6366F1,#8B5CF6); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(99,102,241,0.4);">
+                        <i data-lucide="layers" style="width:20px; height:20px; color:white;"></i>
+                    </div>
+                    <div>
+                        <p style="font-size:1.1rem; font-weight:800; color:#fff; letter-spacing:-0.01em;">Chuyển Trang</p>
+                        <p style="font-size:0.7rem; color:#64748B; font-weight:600; text-transform:uppercase; letter-spacing:0.08em;">Điều hướng hệ thống</p>
+                    </div>
+                </div>
+                <button onclick="closePageNavigator()" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#94A3B8; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#94A3B8';">
+                    <i data-lucide="x" style="width:18px; height:18px;"></i>
+                </button>
+            </div>
+            <!-- Pages Grid -->
+            <div style="padding:20px 28px 28px; display:flex; flex-direction:column; gap:10px;">
+                <p style="font-size:0.65rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:4px;">── WMS Kho HN ──</p>
+                <!-- Kiểm kê - current page -->
+                <a href="../index.html" id="pnav-wms-kk" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.35); text-decoration:none; transition:all 0.25s; position:relative; overflow:hidden;" onmouseover="this.style.background='rgba(99,102,241,0.22)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(99,102,241,0.12)'; this.style.transform='translateX(0)';">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#6366F1,#4F46E5); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(99,102,241,0.4);">
+                        <i data-lucide="package" style="width:18px; height:18px; color:white;"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:0.9rem; font-weight:700; color:#E2E8F0;">Kiểm Kê Hàng Ngày</p>
+                        <p style="font-size:0.72rem; color:#64748B;">Nhập liệu kiểm kê tồn kho thực tế</p>
+                    </div>
+                    <span id="pnav-current-kk" style="font-size:0.6rem; font-weight:700; color:#818CF8; background:rgba(99,102,241,0.2); padding:3px 10px; border-radius:20px; border:1px solid rgba(99,102,241,0.3); display:none;">● Hiện tại</span>
+                </a>
+                <!-- Cận Date -->
+                <a href="data/html/candate.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(245,158,11,0.1)'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#F59E0B,#D97706); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(245,158,11,0.3);">
+                        <i data-lucide="calendar" style="width:18px; height:18px; color:white;"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:0.9rem; font-weight:700; color:#E2E8F0;">Sản Phẩm Cận Date</p>
+                        <p style="font-size:0.72rem; color:#64748B;">Lọc sản phẩm HSD dưới 1 năm</p>
+                    </div>
+                </a>
+                <!-- Mapping Kệ -->
+                <a href="mapping.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(16,185,129,0.1)'; this.style.borderColor='rgba(16,185,129,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#10B981,#059669); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(16,185,129,0.3);">
+                        <i data-lucide="map-pin" style="width:18px; height:18px; color:white;"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:0.9rem; font-weight:700; color:#E2E8F0;">Mapping Kệ Nhanh</p>
+                        <p style="font-size:0.72rem; color:#64748B;">Tra cứu vị trí kệ theo SKU</p>
+                    </div>
+                </a>
+
+                <p style="font-size:0.65rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.12em; margin:8px 0 4px;">── Kho Thuocsi ──</p>
+                <!-- Data Missing -->
+                <a href="data/html/data-missing.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(239,68,68,0.1)'; this.style.borderColor='rgba(239,68,68,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#EF4444,#DC2626); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(239,68,68,0.3);">
+                        <i data-lucide="radar" style="width:18px; height:18px; color:white;"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:0.9rem; font-weight:700; color:#E2E8F0;">Data Missing – Tính Lệch</p>
+                        <p style="font-size:0.72rem; color:#64748B;">Khớp dữ liệu kiểm kê vs hệ thống</p>
+                    </div>
+                </a>
+                <!-- Đối Soát -->
+                <a href="data/html/doisoat.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(139,92,246,0.1)'; this.style.borderColor='rgba(139,92,246,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#8B5CF6,#7C3AED); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(139,92,246,0.3);">
+                        <i data-lucide="shield-check" style="width:18px; height:18px; color:white;"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:0.9rem; font-weight:700; color:#E2E8F0;">Đối Soát Vender</p>
+                        <p style="font-size:0.72rem; color:#64748B;">Quản lý sản lượng & vi phạm</p>
+                    </div>
+                </a>
+                <!-- Tra cứu Nhiều SP -->
+                <a href="data/html/multi-search.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(14,165,233,0.1)'; this.style.borderColor='rgba(14,165,233,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#0EA5E9,#0284C7); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(14,165,233,0.3);">
+                        <i data-lucide="search" style="width:18px; height:18px; color:white;"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <p style="font-size:0.9rem; font-weight:700; color:#E2E8F0;">Tra cứu Nhiều Sản Phẩm</p>
+                        <p style="font-size:0.72rem; color:#64748B;">Tra cứu hàng loạt SKU – tồn kho, vị trí, lot</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl px-5 py-3.5 translate-y-20 opacity-0 transition-all duration-400 rounded-xl flex items-center gap-3 z-[100] backdrop-blur-md">
+        <div id="toastIconBox" class="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+        </div>
+        <span id="toastMsg" class="text-slate-700 dark:text-slate-300 font-semibold text-sm">Đã lưu thành công!</span>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function openPageNavigator() {
+            const modal = document.getElementById('pageNavModal');
+            const box = document.getElementById('pageNavBox');
+            // Mark current page
+            const kkLink = document.getElementById('pnav-current-kk');
+            if (kkLink) kkLink.style.display = 'inline-flex';
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => {
+                box.style.transform = 'scale(1) translateY(0)';
+                box.style.opacity = '1';
+            });
+            document.addEventListener('keydown', _pnavEsc);
+        }
+        function closePageNavigator() {
+            const modal = document.getElementById('pageNavModal');
+            const box = document.getElementById('pageNavBox');
+            box.style.transform = 'scale(0.9) translateY(20px)';
+            box.style.opacity = '0';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+            document.removeEventListener('keydown', _pnavEsc);
+        }
+        function _pnavEsc(e) { if (e.key === 'Escape') closePageNavigator(); }
+        document.getElementById('pageNavModal').addEventListener('click', function(e) {
+            if (e.target === this) closePageNavigator();
+        });
+        // Init box opacity
+        document.getElementById('pageNavBox').style.opacity = '0';
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (e) {
+                console.warn("Lucide failed to load icons", e);
+            }
+
+            // Update date
+            const now = new Date();
+            const dateEl = document.getElementById('currentDate');
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('vi-VN', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            // Theme toggle - shared
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                const theme = initTheme();
+                updateThemeIcon(theme);
+
+                toggle.addEventListener('click', () => {
+                    const next = toggleTheme();
+                    updateThemeIcon(next);
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                });
+            }
+
+            function updateThemeIcon(theme) {
+                const icon = toggle.querySelector('i');
+                if (icon) {
+                    icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            }
+        });
+
+        // Script fail fallback
+        setTimeout(() => {
+            const stat = document.getElementById('statTotalSku');
+            if (stat && stat.textContent === '-') {
+                console.error("Script.js failed to initialize properly");
+                const errorBox = document.createElement('div');
+                errorBox.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg z-[999] text-sm animate-bounce';
+                errorBox.innerHTML = 'Lỗi tải Script! Vui lòng nhấn Ctrl + F5 hoặc kiểm tra Console.';
+                document.body.appendChild(errorBox);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

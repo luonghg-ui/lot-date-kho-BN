@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Missing – Tính Lệch Tồn Kho</title>
+    <meta name="description" content="Tính gap missing giữa dữ liệu hệ thống và số lượng đã kiểm kê thực tế.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/theme.js"></script>
+    <!-- Replace sheetjs with xlsx-js-style for beautiful formatting -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+
+<body>
+    <div class="mesh-bg"></div>
+
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-icon"><i data-lucide="radar"></i></div>
+            <div class="brand-text">
+                <h1>Data Missing Tính Lệch</h1>
+                <p>Khớp dữ liệu theo thời gian thực</p>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+            <button class="btn-export-global" id="exportBtn" style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.3); padding:10px 20px; border-radius:12px; font-family:var(--font-display); font-size:0.85rem; font-weight:600; display:flex; align-items:center; gap:10px; cursor:pointer; transition:all 0.3s;">
+                <i class='bx bxs-file-export'></i>
+                <span>Xuất Excel</span>
+            </button>
+            <button class="theme-toggle" id="themeToggle" title="Chế độ sáng/tối">
+                <i class='bx bx-sun'></i>
+            </button>
+            <button class="btn-page-nav" onclick="openPageNavigator()" title="Chuyển trang">
+                <i class='bx bx-layer'></i>
+            </button>
+            <button class="btn-token" id="tokenBtn" title="Token WMS">
+                <i class='bx bx-key'></i>
+            </button>
+            <button class="btn-refresh" id="refreshBtn">
+                <i class='bx bx-refresh'></i>
+                <span>Làm mới tính toán</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="token-panel" id="tokenPanel" style="display:none;">
+        <div class="token-panel-header">
+            <span><i class='bx bx-key'></i> Token WMS</span>
+            <button class="token-panel-close" id="tokenPanelClose">&times;</button>
+        </div>
+        <div class="token-panel-body">
+            <div class="token-row">
+                <label>Paste cookie string từ DevTools → Application → Cookies (copy tất cả cookies):</label>
+                <textarea id="tokenCookieInput" rows="3" placeholder="_fbp=...; SID=...; session_token=..."></textarea>
+            </div>
+            <div class="token-row">
+                <button class="btn-token-extract" id="tokenExtractBtn">Trích xuất & Lưu</button>
+                <button class="btn-token-test" id="tokenTestBtn">Kiểm tra proxy</button>
+            </div>
+            <div class="token-extracted" id="tokenExtracted" style="display:none;">
+                <div class="token-field"><strong>SID:</strong> <code id="tokenSidDisplay"></code></div>
+                <div class="token-field"><strong>Token:</strong> <code id="tokenTokenDisplay"></code></div>
+                <div class="token-field" id="tokenExtractStatus"></div>
+            </div>
+            <div class="token-test-result" id="tokenTestResult" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <div class="stats-row">
+            <div class="stat-card" onclick="openCatModal('all')" style="cursor:pointer;">
+                <div class="stat-icon blue"><i class='bx bx-collection'></i></div>
+                <div class="stat-label">Tổng MÃ SKU</div>
+                <div class="stat-value" id="statTotalSKU">—</div>
+            </div>
+            <div class="stat-card" onclick="openCatModal('ok')" style="cursor:pointer;">
+                <div class="stat-icon green"><i class='bx bx-check-shield'></i></div>
+                <div class="stat-label">SKU Khớp Hoàn Toàn</div>
+                <div class="stat-value" id="statMatched">—</div>
+            </div>
+            <div class="stat-card" onclick="openCatModal('missing')" style="cursor:pointer;">
+                <div class="stat-icon red"><i class='bx bx-layer-minus'></i></div>
+                <div class="stat-label">SKU Thiếu (Missing)</div>
+                <div class="stat-value" id="statMissing">—</div>
+            </div>
+            <div class="stat-card" onclick="openCatModal('not_out')" style="cursor:pointer;">
+                <div class="stat-icon yellow"><i class='bx bx-layer-plus'></i></div>
+                <div class="stat-label">SKU TÌM THẤY CHƯA KIỂM</div>
+                <div class="stat-value" id="statNotOut">—</div>
+            </div>
+        </div>
+
+        <div id="statusBanner" style="display:none;">
+            <div class="banner loading" id="bannerInner">
+                <i class='bx bx-loader-alt bx-spin'></i>
+                <span>Đang phân tích số liệu chênh lệch...</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-wrap">
+                <i class='bx bx-search'></i>
+                <input type="text" id="searchInput" placeholder="Tìm theo SKU hoặc tên sản phẩm..." disabled>
+            </div>
+            <select class="filter-select" id="gapFilter" disabled>
+                <option value="all">Tất cả (Khớp & Lệch)</option>
+                <option value="diff">Chỉ hiển thị lệch (Missing/Surplus)</option>
+                <option value="missing">Chỉ hiển thị Thiếu</option>
+                <option value="surplus">Chỉ hiển thị Dư</option>
+                <option value="ok">Chỉ hiển thị Khớp</option>
+            </select>
+            <div class="result-badge" id="resultBadge">Sẵn sàng</div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th style="width:50px; text-align:center;">#</th>
+                            <th style="width:60px;"></th>
+                            <th data-col="name" id="thName">Sản phẩm / SKU <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th data-col="sys" id="thSys">CẦN KIỂM <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th data-col="act" id="thAct">ĐÃ KIỂM <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th data-col="gap" id="thGap">CHƯA KIỂM <i class='bx bx-sort-alt-2 sort-icon'></i></th>
+                            <th class="th-vertical">Tìm thấy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr class="skeleton-row"><td colspan="7" style="padding:100px; text-align:center; color:var(--text-dim);">Đang tải và tính toán... Vui lòng thêm cột "Đã kiểm" hoặc "Thực tế" vào Sheet nếu chưa có!</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrap" id="paginationWrap" style="display:none;">
+                <div class="page-info" id="pageInfo"></div>
+                <div class="page-btns" id="pageBtns"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <button class="modal-close" id="modalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- CATEGORY MODAL -->
+    <div class="modal-overlay" id="catModalOverlay">
+        <div class="modal-box" id="catModalBox" style="max-width: 900px;">
+            <button class="modal-close" id="catModalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-header" style="flex-direction: column; align-items: stretch; padding-bottom: 24px;" id="catModalHeader"></div>
+            <div class="modal-body" id="catModalBody" style="padding: 0;"></div>
+        </div>
+    </div>
+
+    <script src="../assets/js/page-nav.js"></script>
+    <script src="../assets/js/script-missing.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{try{if(typeof lucide!=='undefined')lucide.createIcons()}catch(e){}});</script>
+</body>
+</html>

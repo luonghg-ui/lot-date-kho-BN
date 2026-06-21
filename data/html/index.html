@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trợ Lý Kho Hàng Thuocsi</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Boxicons for icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+
+<body class="chatbot-page">
+    <div class="mesh-bg"></div>
+    <div class="chatbot-container">
+        <header class="chat-header">
+            <div class="brand">
+                <div class="brand-icon"><i class='bx bx-bot'></i></div>
+                <div class="brand-text">
+                    <h1>Trợ Lý Kho Hàng</h1>
+                    <p>Sẵn sàng hỗ trợ tra cứu</p>
+                </div>
+            </div>
+            
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link active">
+                    <i class='bx bx-chat'></i>
+                    <span>Trợ Lý</span>
+                </a>
+                <a href="data-missing.html" class="nav-link">
+                    <i class='bx bx-data'></i>
+                    <span>Missing</span>
+                </a>
+                <a href="doisoat.html" class="nav-link">
+                    <i class='bx bx-shield-quarter'></i>
+                    <span>Đối Soát</span>
+                </a>
+                <button class="btn-sync" id="syncDataBtn" title="Đồng bộ dữ liệu từ hệ thống">
+                    <i class='bx bx-sync'></i>
+                    <span>Cập nhật</span>
+                </button>
+                <button class="btn-refresh-mini" id="refreshDataBtn" title="Tải lại dữ liệu">
+                    <i class='bx bx-refresh'></i>
+                </button>
+            </nav>
+        </header>
+
+        <main class="chat-body" id="chatBody">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p>Xin chào! Dữ liệu đang được tải về từ hệ thống...</p>
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="chat-footer">
+            <form id="chatForm" autocomplete="off">
+                <div class="input-container">
+                    <i class='bx bx-search search-icon'></i>
+                    <input type="text" id="userInput" placeholder="Nhập MÃ SKU hoặc Tên sản phẩm..." disabled>
+                    <button type="submit" id="sendBtn" class="send-btn" disabled>
+                        <i class='bx bx-send'></i>
+                    </button>
+                </div>
+            </form>
+        </footer>
+    </div>
+    <script src="../assets/js/script-sync.js"></script>
+    <script src="../assets/js/script.js"></script>
+    <div id="statusBanner" style="display:none;">
+        <div class="banner loading" id="bannerInner">
+            <i class='bx bx-loader-alt bx-spin'></i>
+            <span>Đang xử lý...</span>
+        </div>
+    </div>
+
+    <!-- PAGE NAVIGATOR MODAL -->
+    <div id="pageNavModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(2,6,23,0.8); backdrop-filter:blur(20px); align-items:center; justify-content:center; padding:20px;">
+        <div id="pageNavBox" style="width:100%; max-width:480px; border-radius:28px; overflow:hidden; background:linear-gradient(145deg,rgba(30,41,59,0.97),rgba(15,23,42,0.99)); border:1px solid rgba(255,255,255,0.1); box-shadow:0 40px 100px rgba(0,0,0,0.8); transform:scale(0.9) translateY(20px); opacity:0; transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+            <div style="padding:24px 24px 18px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,#6366F1,#8B5CF6); display:flex; align-items:center; justify-content:center; font-size:18px; color:white; box-shadow:0 6px 20px rgba(99,102,241,0.4);"><i class='bx bx-layer'></i></div>
+                    <div>
+                        <p style="font-size:1rem; font-weight:800; color:#fff;">Chuyển Trang</p>
+                        <p style="font-size:0.65rem; color:#475569; font-weight:700; text-transform:uppercase; letter-spacing:0.1em;">Điều hướng hệ thống</p>
+                    </div>
+                </div>
+                <button onclick="closePageNavigator()" style="width:34px; height:34px; border-radius:9px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#94A3B8; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:20px; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94A3B8';"><i class='bx bx-x'></i></button>
+            </div>
+            <div style="padding:16px 24px 24px; display:flex; flex-direction:column; gap:8px;">
+                <p style="font-size:0.6rem; font-weight:700; color:#334155; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:2px;">─ WMS Kho HN ─</p>
+                <a href="../../index.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(99,102,241,0.12)'; this.style.borderColor='rgba(99,102,241,0.35)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#6366F1,#4F46E5); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:white; box-shadow:0 4px 12px rgba(99,102,241,0.4);"><i class='bx bx-package'></i></div>
+                    <div><p style="font-size:0.88rem; font-weight:700; color:#E2E8F0;">Kiểm Kê Hàng Ngày</p><p style="font-size:0.7rem; color:#475569;">Nhập liệu kiểm kê tồn kho</p></div>
+                </a>
+                <a href="../../mapping.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(16,185,129,0.1)'; this.style.borderColor='rgba(16,185,129,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#10B981,#059669); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:white; box-shadow:0 4px 12px rgba(16,185,129,0.3);"><i class='bx bx-map-pin'></i></div>
+                    <div><p style="font-size:0.88rem; font-weight:700; color:#E2E8F0;">Mapping Kệ Nhanh</p><p style="font-size:0.7rem; color:#475569;">Tra cứu vị trí kệ theo SKU</p></div>
+                </a>
+                <p style="font-size:0.6rem; font-weight:700; color:#334155; text-transform:uppercase; letter-spacing:0.15em; margin:6px 0 2px;">─ Kho Thuocsi ─</p>
+                <a href="index.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(6,182,212,0.12); border:1px solid rgba(6,182,212,0.35); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(6,182,212,0.2)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(6,182,212,0.12)'; this.style.transform='translateX(0)';">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#06B6D4,#0891B2); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:white; box-shadow:0 4px 12px rgba(6,182,212,0.3);"><i class='bx bx-bot'></i></div>
+                    <div style="flex:1;"><p style="font-size:0.88rem; font-weight:700; color:#E2E8F0;">Trợ Lý Kho Hàng AI</p><p style="font-size:0.7rem; color:#475569;">Tra cứu thông tin sản phẩm</p></div>
+                    <span style="font-size:0.58rem; font-weight:700; color:#22D3EE; background:rgba(6,182,212,0.2); padding:2px 9px; border-radius:20px; border:1px solid rgba(6,182,212,0.35)">● Hiện tại</span>
+                </a>
+                <a href="data-pa.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(245,158,11,0.1)'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#F59E0B,#D97706); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:white; box-shadow:0 4px 12px rgba(245,158,11,0.3);"><i class='bx bx-table'></i></div>
+                    <div><p style="font-size:0.88rem; font-weight:700; color:#E2E8F0;">Data Kiểm Kê PA</p><p style="font-size:0.7rem; color:#475569;">Tra cứu tồn kho theo vị trí</p></div>
+                </a>
+                <a href="data-missing.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(239,68,68,0.1)'; this.style.borderColor='rgba(239,68,68,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#EF4444,#DC2626); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:white; box-shadow:0 4px 12px rgba(239,68,68,0.3);"><i class='bx bx-radar'></i></div>
+                    <div><p style="font-size:0.88rem; font-weight:700; color:#E2E8F0;">Data Missing – Tính Lệch</p><p style="font-size:0.7rem; color:#475569;">Khớp dữ liệu kiểm kê vs hệ thống</p></div>
+                </a>
+                <a href="doisoat.html" onclick="closePageNavigator()" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='rgba(139,92,246,0.1)'; this.style.borderColor='rgba(139,92,246,0.3)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.07)'; this.style.transform='translateX(0)';">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#8B5CF6,#7C3AED); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:white; box-shadow:0 4px 12px rgba(139,92,246,0.3);"><i class='bx bx-shield-quarter'></i></div>
+                    <div><p style="font-size:0.88rem; font-weight:700; color:#E2E8F0;">Đối Soát Vender</p><p style="font-size:0.7rem; color:#475569;">Quản lý sản lượng &amp; vi phạm</p></div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openPageNavigator() {
+            const m = document.getElementById('pageNavModal'), b = document.getElementById('pageNavBox');
+            m.style.display = 'flex';
+            requestAnimationFrame(() => { b.style.transform = 'scale(1) translateY(0)'; b.style.opacity = '1'; });
+            document.addEventListener('keydown', _pnavEsc);
+        }
+        function closePageNavigator() {
+            const m = document.getElementById('pageNavModal'), b = document.getElementById('pageNavBox');
+            b.style.transform = 'scale(0.9) translateY(20px)'; b.style.opacity = '0';
+            setTimeout(() => { m.style.display = 'none'; }, 300);
+            document.removeEventListener('keydown', _pnavEsc);
+        }
+        function _pnavEsc(e) { if (e.key === 'Escape') closePageNavigator(); }
+        document.getElementById('pageNavModal').addEventListener('click', function(e) { if (e.target === this) closePageNavigator(); });
+    </script>
+</body>
+
+</html>
