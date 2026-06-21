@@ -349,9 +349,41 @@ function exportToExcel() {
     } catch (err) { alert('Lỗi xuất Excel: ' + err.message); }
 }
 
+function exportToTemplate() {
+    const dataToExport = filtered.length ? filtered : allData;
+    if (!dataToExport.length) { alert('Không có dữ liệu!'); return; }
+    try {
+        const rows = dataToExport.map((d, i) => ({
+            STT: i + 1, 'Mã SKU': d.sku, 'Tên Sản Phẩm': d.name,
+            'Vị Trí': d.location || '-', 'Tồn HT': d.qty, 'Lot HT': d.lot || '-', 'HSD HT': d.expDate || '-',
+            'Lot Thực Tế': '', 'HSD Thực Tế': '', 'SL Thực Tế': '', 'Ghi Chú': ''
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Kiểm Kê Date');
+        
+        const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, name: 'Arial', sz: 11 }, fill: { patternType: 'solid', fgColor: { rgb: '10B981' } }, alignment: { horizontal: 'center', vertical: 'center' }, border: { top: { style: 'thin', color: { rgb: 'B2B2B2' } }, bottom: { style: 'thin', color: { rgb: 'B2B2B2' } }, left: { style: 'thin', color: { rgb: 'B2B2B2' } }, right: { style: 'thin', color: { rgb: 'B2B2B2' } } } };
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const ref = XLSX.utils.encode_cell({ r: R, c: C });
+                if (ws[ref]) {
+                    ws[ref].s = { border: { top: { style: 'thin', color: { rgb: 'E2E8F0' } }, bottom: { style: 'thin', color: { rgb: 'E2E8F0' } }, left: { style: 'thin', color: { rgb: 'E2E8F0' } }, right: { style: 'thin', color: { rgb: 'E2E8F0' } } } };
+                    if (R === 0) ws[ref].s = { ...ws[ref].s, ...headerStyle };
+                }
+            }
+        }
+        ws['!cols'] = [{ wch: 6 }, { wch: 25 }, { wch: 50 }, { wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 14 }, { wch: 15 }, { wch: 14 }, { wch: 12 }, { wch: 20 }];
+        const d = new Date();
+        XLSX.writeFile(wb, `Mau_Kiem_Ke_Date_${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}.xlsx`);
+    } catch (err) { alert('Lỗi xuất Mẫu kiểm kê: ' + err.message); }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const exBtn = document.getElementById('exportBtn');
     if (exBtn) exBtn.addEventListener('click', exportToExcel);
+    const exTemplateBtn = document.getElementById('exportTemplateBtn');
+    if (exTemplateBtn) exTemplateBtn.addEventListener('click', exportToTemplate);
     // ── Token Panel ──
     const tokenBtn = document.getElementById('tokenBtn');
     const tokenPanel = document.getElementById('tokenPanel');
