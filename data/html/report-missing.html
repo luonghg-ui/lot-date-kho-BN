@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Missing – Kho Thuocsi</title>
+    <meta name="description" content="Báo cáo phân tích dữ liệu missing, chênh lệch tồn kho theo ngày, ca làm việc và top sản phẩm.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/theme.js"></script>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+
+    <style>
+        /* Custom Styles for Modern Dashboard & Sidebar */
+        :root {
+            --sidebar-width: 100px;
+        }
+        body {
+            background-color: #080c14;
+            color: #f8fafc;
+            font-family: 'Inter', 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .app-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0d1220;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            flex-shrink: 0;
+            justify-content: space-between;
+        }
+        .sidebar-brand {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+            margin-bottom: 32px;
+        }
+        .sidebar-brand i, .sidebar-brand svg {
+            width: 24px;
+            height: 24px;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .sidebar-item {
+            width: 76px;
+            height: 76px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            text-decoration: none;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        .sidebar-item i, .sidebar-item svg {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.3s;
+        }
+        .sidebar-item span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .sidebar-item:hover {
+            color: #a78bfa;
+            background: rgba(168, 85, 247, 0.08);
+        }
+        .sidebar-item:hover i, .sidebar-item:hover svg {
+            transform: scale(1.1);
+        }
+        .sidebar-item.active {
+            color: #ffffff;
+            background: rgba(139, 92, 246, 0.18);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            box-shadow: inset 0 0 12px rgba(139, 92, 246, 0.1);
+        }
+        .sidebar-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+        .status-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        .status-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            line-height: 1.2;
+        }
+        
+        /* Main view wrapper */
+        .main-wrapper {
+            flex-grow: 1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        /* Top bar styling */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .header-title-section h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+        .header-subtitle-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .header-sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #10b981;
+            display: inline-block;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* Report Specific Layouts */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .chart-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            min-height: 380px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Top Missing Products Layout */
+        .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .top-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.25s;
+        }
+        .top-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(99, 102, 241, 0.25);
+            transform: translateX(4px);
+        }
+        .top-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .rank-1 { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .rank-2 { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .rank-3 { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .rank-other { background: rgba(255, 255, 255, 0.05); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        .top-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .top-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .top-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .top-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            border-radius: 10px;
+        }
+        .top-val-box {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .top-val-qty {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f87171;
+            font-family: 'Outfit', sans-serif;
+        }
+        .top-val-money {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* Stats Grid (Bento) */
+        .report-stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+        @media (max-width: 850px) {
+            .report-stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .report-stats-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card-custom {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .stat-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        .stat-icon-box.purple { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
+        .stat-icon-box.red { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .stat-icon-box.green { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .stat-icon-box.blue { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+
+        .stat-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.1;
+        }
+        .stat-desc {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mesh-bg"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo-section" style="display:flex; flex-direction:column; align-items:center;">
+                <div class="sidebar-brand">
+                    <i data-lucide="bar-chart-3"></i>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="data-missing.html" class="sidebar-item">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="report-missing.html" class="sidebar-item active">
+                    <i data-lucide="line-chart"></i>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="doisoat.html" class="sidebar-item">
+                    <i data-lucide="shield-check"></i>
+                    <span>Đối soát</span>
+                </a>
+                <a href="candate.html" class="sidebar-item">
+                    <i data-lucide="bell"></i>
+                    <span>Cảnh báo</span>
+                </a>
+                <a href="#" class="sidebar-item" id="tokenBtn">
+                    <i data-lucide="settings"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Báo Cáo</span>
+                    <span class="status-name">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main View Area -->
+        <main class="main-wrapper">
+            <header class="top-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="brand" style="display: flex; align-items: center; gap: 12px;">
+                    <div class="brand-icon" style="width: 40px; height: 40px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; color: #6366f1;">
+                        <i data-lucide="pie-chart"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1 style="font-size: 20px; font-weight: 800; color: #fff; margin: 0; font-family: 'Outfit';">Báo Cáo Missing & Chênh Lệch</h1>
+                        <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Phân tích biểu đồ chênh lệch kiểm kê</p>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <button class="theme-toggle" id="themeToggle" title="Chế độ sáng/tối" style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); color: #94a3b8; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class='bx bx-sun' style="font-size: 20px;"></i>
+                    </button>
+                    <button class="btn-page-nav" onclick="openPageNavigator()" title="Chuyển trang" style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); color: #94a3b8; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class='bx bx-layer' style="font-size: 20px;"></i>
+                    </button>
+                    <button class="btn-refresh-mini" id="refreshBtn" title="Làm mới dữ liệu" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.25); color: #818cf8; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class='bx bx-refresh' style="font-size: 20px;"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Bento Stats Cards -->
+            <div class="report-stats-row">
+                <div class="stat-card-custom">
+                    <div class="stat-icon-box red"><i data-lucide="package-x"></i></div>
+                    <span class="stat-title">Tổng SKU Bị Missing</span>
+                    <span class="stat-value" id="statTotalSkus">-</span>
+                    <span class="stat-desc">Số lượng mặt hàng có chênh lệch âm</span>
+                </div>
+                <div class="stat-card-custom">
+                    <div class="stat-icon-box purple"><i data-lucide="coins"></i></div>
+                    <span class="stat-title">Tổng Tiền Thất Thoát</span>
+                    <span class="stat-value" id="statTotalMoney">-</span>
+                    <span class="stat-desc">Ước tính giá trị hàng chênh lệch</span>
+                </div>
+                <div class="stat-card-custom">
+                    <div class="stat-icon-box blue"><i data-lucide="calendar-check"></i></div>
+                    <span class="stat-title">Ngày Bị Nhiều Nhất</span>
+                    <span class="stat-value" id="statPeakDate" style="font-size: 20px; font-weight: 700;">-</span>
+                    <span class="stat-desc" id="statPeakDateDesc">Số lượng lớn nhất trong 1 ngày</span>
+                </div>
+                <div class="stat-card-custom">
+                    <div class="stat-icon-box green"><i data-lucide="clock"></i></div>
+                    <span class="stat-title">Ca Bị Nhiều Nhất</span>
+                    <span class="stat-value" id="statPeakShift" style="font-size: 20px; font-weight: 700;">-</span>
+                    <span class="stat-desc" id="statPeakShiftDesc">Tỷ lệ chênh lệch theo ca</span>
+                </div>
+            </div>
+
+            <!-- Charts & Reports Dashboard -->
+            <div class="dashboard-grid">
+                <!-- Daily Missing Report (Line/Bar Chart) -->
+                <div class="chart-card">
+                    <div class="chart-header" style="flex-wrap: wrap; gap: 10px;">
+                        <span class="chart-title"><i class='bx bx-line-chart'></i> Biến động chênh lệch theo ngày</span>
+                        <div class="chart-actions" style="display: flex; gap: 4px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 2px;">
+                            <button id="btnChartModeQty" onclick="setChartMode('qty')" class="active" style="background:#6366f1; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">Số lượng</button>
+                            <button id="btnChartModeAmt" onclick="setChartMode('amt')" style="background:transparent; color:#94a3b8; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">Giá trị (đ)</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Shift Rate Comparison (Doughnut Chart) -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title"><i class='bx bx-pie-chart-alt'></i> Tỷ lệ Missing giữa các ca làm việc</span>
+                        <div class="chart-actions">
+                            <span id="shiftUnitLabel" style="font-size: 11px; color: #64748b;">Theo lượng chênh lệch</span>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="max-height: 280px; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="shiftChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Missing Products List & Table -->
+            <div class="chart-card" style="min-height: auto;">
+                <div class="chart-header">
+                    <span class="chart-title"><i class='bx bxs-hot'></i> Top 10 sản phẩm có lượng missing nhiều nhất</span>
+                    <span style="font-size: 11px; color: #64748b;">Xếp hạng chênh lệch âm</span>
+                </div>
+                <div class="top-list" id="topProductsList">
+                    <!-- Loading skeleton -->
+                    <div style="text-align: center; padding: 40px; color: var(--text-dim);">Đang tải dữ liệu báo cáo...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Background syncer banner -->
+    <div id="statusBanner" style="display:none;">
+        <div class="banner loading" id="bannerInner">
+            <i class='bx bx-loader-alt bx-spin'></i>
+            <span>Đang tải dữ liệu từ Google Sheets...</span>
+        </div>
+    </div>
+
+    <script src="../assets/js/page-nav.js"></script>
+    <script src="../../settings.js"></script>
+    <script src="../assets/js/script-report-missing.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (e) {}
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đối Soát Sản Lượng Vender – Kho Thuocsi</title>
+    <meta name="description" content="Hệ thống đối soát sản lượng vender, quản lý SKU và vi phạm thời gian thực.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/theme.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+
+    <style>
+        /* Custom Styles for Modern Dashboard & Sidebar */
+        :root {
+            --sidebar-width: 100px;
+        }
+        body {
+            background-color: #080c14;
+            color: #f8fafc;
+            font-family: 'Inter', 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .app-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0d1220;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            flex-shrink: 0;
+            justify-content: space-between;
+        }
+        .sidebar-brand {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+            margin-bottom: 32px;
+        }
+        .sidebar-brand i, .sidebar-brand svg {
+            width: 24px;
+            height: 24px;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .sidebar-item {
+            width: 76px;
+            height: 76px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            text-decoration: none;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        .sidebar-item i, .sidebar-item svg {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.3s;
+        }
+        .sidebar-item span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .sidebar-item:hover {
+            color: #a78bfa;
+            background: rgba(168, 85, 247, 0.08);
+        }
+        .sidebar-item:hover i, .sidebar-item:hover svg {
+            transform: scale(1.1);
+        }
+        .sidebar-item.active {
+            color: #ffffff;
+            background: rgba(139, 92, 246, 0.18);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            box-shadow: inset 0 0 12px rgba(139, 92, 246, 0.1);
+        }
+        .sidebar-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+        .status-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        .status-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            line-height: 1.2;
+        }
+        
+        /* Main view wrapper */
+        .main-wrapper {
+            flex-grow: 1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mesh-bg"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo-section" style="display:flex; flex-direction:column; align-items:center;">
+                <div class="sidebar-brand">
+                    <i data-lucide="radar"></i>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="data-missing.html" class="sidebar-item">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="report-missing.html" class="sidebar-item">
+                    <i data-lucide="line-chart"></i>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="doisoat.html" class="sidebar-item active">
+                    <i data-lucide="shield-check"></i>
+                    <span>Đối soát</span>
+                </a>
+                <a href="candate.html" class="sidebar-item">
+                    <i data-lucide="bell"></i>
+                    <span>Cảnh báo</span>
+                </a>
+                <a href="#" class="sidebar-item" id="tokenBtn">
+                    <i data-lucide="settings"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Kho Dữ Liệu</span>
+                    <span class="status-name">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main View Area -->
+        <main class="main-wrapper">
+            <header class="top-bar">
+                <div class="brand">
+                    <div class="brand-icon"><i data-lucide="shield-check"></i></div>
+                    <div class="brand-text">
+                        <h1>Đối Soát Vender</h1>
+                        <p>Quản lý sản lượng & vi phạm</p>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <button class="theme-toggle" id="themeToggle" title="Chế độ sáng/tối">
+                        <i class='bx bx-sun'></i>
+                    </button>
+                    <button class="btn-page-nav" onclick="openPageNavigator()" title="Chuyển trang">
+                        <i class='bx bx-layer'></i>
+                    </button>
+                    <button class="btn-refresh-mini" id="refreshBtn" title="Làm mới dữ liệu">
+                        <i class='bx bx-refresh'></i>
+                    </button>
+                </div>
+            </header>
+
+    <div class="page-wrapper">
+        <div class="reconcile-header">
+            <h2 class="reconcile-title">Đối soát sản lượng của vender</h2>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn-export-global" id="exportAllBtn" title="Xuất Excel tất cả">
+                    <i class='bx bxs-file-export'></i> Xuất excel
+                </button>
+                <button class="btn-refresh-cards" id="refreshCardsBtn"><i class='bx bx-sync'></i></button>
+            </div>
+        </div>
+
+        <div class="vendor-grid" id="vendorGrid">
+            <!-- Skeleton Cards -->
+            <div class="vendor-card"><div class="stat-value">...</div></div>
+            <div class="vendor-card"><div class="stat-value">...</div></div>
+            <div class="vendor-card"><div class="stat-value">...</div></div>
+        </div>
+
+        <div class="toolbar" style="margin-top: 40px; margin-bottom: 20px;">
+            <div class="search-wrap">
+                <i class='bx bx-search'></i>
+                <input type="text" id="searchInput" placeholder="Nhập họ và tên nhân viên để tra cứu...">
+            </div>
+            <div class="result-badge" id="resultBadge">Sẵn sàng</div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:120px;">Ngày</th>
+                            <th>Họ và tên</th>
+                            <th>Mã NV</th>
+                            <th>Bộ phận</th>
+                            <th>Ca làm</th>
+                            <th>Sản lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="6" style="padding:40px; text-align:center; color:var(--text-dim);">Đang tải dữ liệu...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-wrap" id="paginationWrap" style="display:none;">
+                <div class="page-info" id="pageInfo"></div>
+                <div class="page-btns" id="pageBtns"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" style="max-width: 520px;">
+            <button class="modal-close" id="modalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-body" style="padding: 28px 36px 36px;">
+                <div id="reconcileDetailContent">
+                    <!-- Dynamic Content injected by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="statusBanner" style="display:none;">
+        <div class="banner loading" id="bannerInner">
+            <i class='bx bx-loader-alt bx-spin'></i>
+            <span>Đang đồng bộ dữ liệu...</span>
+        </div>
+    </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/page-nav.js"></script>
+    <script src="../assets/js/script-doisoat.js?v=2"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{try{if(typeof lucide!=='undefined')lucide.createIcons()}catch(e){}});</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 360px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 16px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .header h1 { font-size: 16px; font-weight: 600; }
+        .badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        .badge.on { background: #059669; color: #fff; }
+        .badge.off { background: #dc2626; color: #fff; }
+        .badge.wait { background: #d97706; color: #fff; }
+        .section {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .section label {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .section .value {
+            font-size: 13px;
+            word-break: break-all;
+            font-family: 'Consolas', monospace;
+        }
+        .section .value.tkn {
+            color: #fbbf24;
+            font-size: 11px;
+            max-height: 60px;
+            overflow: hidden;
+            position: relative;
+        }
+        .section .value.tkn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(transparent, #1e293b);
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            background: #4f46e5;
+            color: #fff;
+            transition: background .2s;
+            margin-bottom: 8px;
+        }
+        .btn:hover { background: #6366f1; }
+        .btn:active { background: #4338ca; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn.secondary { background: #334155; }
+        .btn.secondary:hover { background: #475569; }
+        .status {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+        .status.ok { color: #34d399; }
+        .status.err { color: #f87171; }
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #475569;
+            margin-top: 12px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-family: 'Consolas', monospace;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: #4f46e5; }
+        .row { display: flex; gap: 8px; align-items: center; }
+        .row .btn { margin-bottom: 0; width: auto; padding: 6px 12px; font-size: 12px; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background: #475569; border-radius: 10px; transition: .3s;
+        }
+        .slider::before {
+            content: ''; position: absolute; height: 16px; width: 16px; left: 2px; bottom: 2px;
+            background: #fff; border-radius: 50%; transition: .3s;
+        }
+        input:checked + .slider { background: #4f46e5; }
+        input:checked + .slider::before { transform: translateX(16px); }
+        .auto-row { display: flex; align-items: center; justify-content: space-between; }
+    </style>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+<body>
+    <div class="header">
+        <h1>WMS Token Sync</h1>
+        <span class="badge off" id="statusBadge">Chưa kết nối</span>
+    </div>
+
+    <div class="section">
+        <label>Proxy URL</label>
+        <div class="row">
+            <input type="text" id="proxyUrl" value="http://localhost:8081">
+            <button class="btn secondary" id="saveUrl">Lưu</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>SID</label>
+        <div class="value tkn" id="sidDisplay">-</div>
+    </div>
+
+    <div class="section">
+        <label>Session Token</label>
+        <div class="value tkn" id="tokenDisplay">-</div>
+    </div>
+
+    <div class="section auto-row">
+        <label style="margin:0;">Tự động đồng bộ</label>
+        <label class="switch">
+            <input type="checkbox" id="autoSync">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <button class="btn" id="syncBtn">&#x21bb; Đồng bộ Token ngay</button>
+    <div class="status" id="statusMsg">Nhấn "Đồng bộ" để lấy token từ internal.thuocsi.vn</div>
+    <div class="footer">WMS Inventory Tool</div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

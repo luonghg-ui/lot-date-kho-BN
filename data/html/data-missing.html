@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Missing – Tính Lệch Tồn Kho</title>
+    <meta name="description" content="Tính gap missing giữa dữ liệu hệ thống và số lượng đã kiểm kê thực tế.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/theme.js"></script>
+    <!-- Replace sheetjs with xlsx-js-style for beautiful formatting -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+
+    <style>
+        /* Custom Styles for Modern Dashboard & Sidebar */
+        :root {
+            --sidebar-width: 100px;
+        }
+        body {
+            background-color: #080c14;
+            color: #f8fafc;
+            font-family: 'Inter', 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .app-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0d1220;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            flex-shrink: 0;
+            justify-content: space-between;
+        }
+        .sidebar-brand {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+            margin-bottom: 32px;
+        }
+        .sidebar-brand i, .sidebar-brand svg {
+            width: 24px;
+            height: 24px;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .sidebar-item {
+            width: 76px;
+            height: 76px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            text-decoration: none;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        .sidebar-item i, .sidebar-item svg {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.3s;
+        }
+        .sidebar-item span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .sidebar-item:hover {
+            color: #a78bfa;
+            background: rgba(168, 85, 247, 0.08);
+        }
+        .sidebar-item:hover i, .sidebar-item:hover svg {
+            transform: scale(1.1);
+        }
+        .sidebar-item.active {
+            color: #ffffff;
+            background: rgba(139, 92, 246, 0.18);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            box-shadow: inset 0 0 12px rgba(139, 92, 246, 0.1);
+        }
+        .sidebar-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+        .status-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        .status-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            line-height: 1.2;
+        }
+        
+        /* Main view wrapper */
+        .main-wrapper {
+            flex-grow: 1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        /* Top bar styling */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .header-title-section h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+        .header-subtitle-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .header-sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #10b981;
+            display: inline-block;
+            box-shadow: 0 0 8px #10b981;
+        }
+        
+        /* Header actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-excel {
+            background: rgba(16, 185, 129, 0.06);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-excel:hover {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+        }
+        .action-icon-btn {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .action-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .btn-badge-toggle {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-refresh-accent {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border: none;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+            transition: all 0.25s;
+        }
+        .btn-refresh-accent:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
+
+        /* Redesigned Stat Cards with line chart background */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+        .stat-card-custom {
+            background: linear-gradient(145deg, rgba(20, 26, 42, 0.8), rgba(9, 12, 24, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+        .stat-card-custom::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .stat-card-custom:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Specific glowing styles */
+        .stat-card-custom.purple-glow:hover { border-color: rgba(168, 85, 247, 0.35); }
+        .stat-card-custom.green-glow:hover { border-color: rgba(16, 185, 129, 0.35); }
+        .stat-card-custom.red-glow:hover { border-color: rgba(239, 68, 68, 0.35); }
+        .stat-card-custom.yellow-glow:hover { border-color: rgba(245, 158, 11, 0.35); }
+
+        .stat-card-custom-header {
+            display: flex;
+            justify-content: flex-start;
+        }
+        .stat-card-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .stat-card-custom.purple-glow .stat-card-icon-box { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
+        .stat-card-custom.green-glow .stat-card-icon-box { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .stat-card-custom.red-glow .stat-card-icon-box { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .stat-card-custom.yellow-glow .stat-card-icon-box { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+        .stat-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 2;
+        }
+        .stat-card-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stat-card-val {
+            font-size: 34px;
+            font-weight: 800;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.1;
+        }
+        .stat-card-subtext {
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            margin-top: 4px;
+        }
+        .stat-card-chart {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 140px;
+            height: 60px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Toolbar Styling */
+        .toolbar-custom {
+            background: rgba(15, 22, 38, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+        }
+        .search-container i, .search-container svg {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 18px;
+            pointer-events: none;
+        }
+        .search-input-custom {
+            width: 100%;
+            background: rgba(9, 12, 24, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px 16px 10px 46px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s;
+        }
+        .search-input-custom:focus {
+            border-color: rgba(99, 102, 241, 0.4);
+            background: rgba(9, 12, 24, 0.8);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+        }
+        .filter-select-custom {
+            background: rgba(9, 12, 24, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            min-width: 200px;
+            transition: all 0.25s;
+        }
+        .filter-select-custom:focus {
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+        .badge-count {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        /* Beautiful Table and Row Formatting */
+        .table-custom-wrap {
+            background: rgba(15, 22, 38, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .table-custom th {
+            padding: 16px 24px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            user-select: none;
+        }
+        .table-custom th:hover {
+            color: #ffffff;
+        }
+        .table-custom td {
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 14px;
+            vertical-align: middle;
+            color: #cbd5e1;
+        }
+        .table-custom tbody tr {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .table-custom tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        /* Cell design details */
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .product-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: contain;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2px;
+        }
+        .product-name-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-width: 400px;
+        }
+        .product-title {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+        .product-sku {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #64748b;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Capsule red badge for Chưa Kiểm / Gap */
+        .badge-gap-capsule {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            min-width: 54px;
+        }
+        .badge-gap-capsule.ok {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+        }
+        .badge-gap-capsule.surplus {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.25);
+            color: #60a5fa;
+        }
+        
+        /* Action cloud button */
+        .btn-action-cloud {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-action-cloud:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.35);
+            color: #a78bfa;
+            transform: scale(1.05);
+        }
+        .btn-action-cloud.synced {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        /* Pagination design override */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(9, 12, 24, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .pagination-info {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .pagination-info b {
+            color: #ffffff;
+        }
+        .pagination-buttons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pagination-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .pagination-btn:hover:not([disabled]) {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+        .pagination-btn.active {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+        }
+        .pagination-btn[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mesh-bg"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo-section" style="display:flex; flex-direction:column; align-items:center;">
+                <div class="sidebar-brand">
+                    <i data-lucide="radar"></i>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="data-missing.html" class="sidebar-item active">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="report-missing.html" class="sidebar-item">
+                    <i data-lucide="line-chart"></i>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="doisoat.html" class="sidebar-item">
+                    <i data-lucide="shield-check"></i>
+                    <span>Đối soát</span>
+                </a>
+                <a href="candate.html" class="sidebar-item">
+                    <i data-lucide="bell"></i>
+                    <span>Cảnh báo</span>
+                </a>
+                <a href="#" class="sidebar-item" id="tokenBtn">
+                    <i data-lucide="settings"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Kho Dữ Liệu</span>
+                    <span class="status-name">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main View Area -->
+        <main class="main-wrapper">
+            <header class="header-top">
+                <div class="header-title-section">
+                    <h1>Data Missing Tính Lệch</h1>
+                    <div class="header-subtitle-section">
+                        <span>Khớp dữ liệu theo thời gian thực</span>
+                        <span class="header-sync-dot"></span>
+                        <span id="syncStatusText">Đang đồng bộ</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-excel" id="exportBtn">
+                        <i class='bx bxs-file-export'></i>
+                        <span>Xuất Excel</span>
+                    </button>
+                    <button class="action-icon-btn" id="themeToggle" title="Chế độ sáng/tối">
+                        <i class='bx bx-sun'></i>
+                    </button>
+                    <button class="action-icon-btn" onclick="openPageNavigator()" title="Chuyển trang">
+                        <i class='bx bx-layer'></i>
+                    </button>
+                    <span class="btn-badge-toggle">On</span>
+                    <button class="btn-refresh-accent" id="refreshBtn">
+                        <i class='bx bx-refresh'></i>
+                        <span>Làm mới tính toán</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="token-panel" id="tokenPanel" style="display:none;">
+                <div class="token-panel-header">
+                    <span><i class='bx bx-key'></i> Token WMS</span>
+                    <button class="token-panel-close" id="tokenPanelClose">&times;</button>
+                </div>
+                <div class="token-panel-body">
+                    <div class="token-row">
+                        <label>Paste cookie string từ DevTools → Application → Cookies (copy tất cả cookies):</label>
+                        <textarea id="tokenCookieInput" rows="3" placeholder="_fbp=...; SID=...; session_token=..."></textarea>
+                    </div>
+                    <div class="token-row">
+                        <button class="btn-token-extract" id="tokenExtractBtn">Trích xuất & Lưu</button>
+                        <button class="btn-token-test" id="tokenTestBtn">Kiểm tra proxy</button>
+                    </div>
+                    <div class="token-extracted" id="tokenExtracted" style="display:none;">
+                        <div class="token-field"><strong>SID:</strong> <code id="tokenSidDisplay"></code></div>
+                        <div class="token-field"><strong>Token:</strong> <code id="tokenTokenDisplay"></code></div>
+                        <div class="token-field" id="tokenExtractStatus"></div>
+                    </div>
+                    <div class="token-test-result" id="tokenTestResult" style="display:none;"></div>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats Row with Line Chart SVGs -->
+            <div class="dashboard-stats">
+                <div class="stat-card-custom purple-glow" onclick="openCatModal('all')">
+                    <div class="stat-card-custom-header">
+                        <div class="stat-card-icon-box">
+                            <i data-lucide="package"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-body">
+                        <span class="stat-card-title">Tổng MÃ SKU</span>
+                        <span class="stat-card-val" id="statTotalSKU">—</span>
+                        <span class="stat-card-subtext" id="statTotalSKUSub">Tất cả sản phẩm</span>
+                    </div>
+                    <div class="stat-card-chart">
+                        <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="card-chart">
+                            <defs>
+                                <linearGradient id="purple-grad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="rgba(168, 85, 247, 0.25)" />
+                                    <stop offset="100%" stop-color="rgba(168, 85, 247, 0)" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,38 Q15,20 30,30 T60,15 T90,25 T100,10 L100,40 L0,40 Z" fill="url(#purple-grad)" />
+                            <path d="M0,38 Q15,20 30,30 T60,15 T90,25 T100,10" fill="none" stroke="#a855f7" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="stat-card-custom green-glow" onclick="openCatModal('ok')">
+                    <div class="stat-card-custom-header">
+                        <div class="stat-card-icon-box">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-body">
+                        <span class="stat-card-title">SKU Khớp Hoàn Toàn</span>
+                        <span class="stat-card-val" id="statMatched">—</span>
+                        <span class="stat-card-subtext" id="statMatchedSub">0% tổng SKU</span>
+                    </div>
+                    <div class="stat-card-chart">
+                        <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="card-chart">
+                            <defs>
+                                <linearGradient id="green-grad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="rgba(16, 185, 129, 0.25)" />
+                                    <stop offset="100%" stop-color="rgba(16, 185, 129, 0)" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,35 Q20,38 40,20 T70,25 T100,5 L100,40 L0,40 Z" fill="url(#green-grad)" />
+                            <path d="M0,35 Q20,38 40,20 T70,25 T100,5" fill="none" stroke="#10b981" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="stat-card-custom red-glow" onclick="openCatModal('missing')">
+                    <div class="stat-card-custom-header">
+                        <div class="stat-card-icon-box">
+                            <i data-lucide="layers"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-body">
+                        <span class="stat-card-title">SKU Thiếu (Missing)</span>
+                        <span class="stat-card-val" id="statMissing">—</span>
+                        <span class="stat-card-subtext" id="statMissingSub">0% tổng SKU</span>
+                    </div>
+                    <div class="stat-card-chart">
+                        <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="card-chart">
+                            <defs>
+                                <linearGradient id="red-grad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="rgba(239, 68, 68, 0.25)" />
+                                    <stop offset="100%" stop-color="rgba(239, 68, 68, 0)" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,30 Q25,35 50,15 T80,28 T100,12 L100,40 L0,40 Z" fill="url(#red-grad)" />
+                            <path d="M0,30 Q25,35 50,15 T80,28 T100,12" fill="none" stroke="#ef4444" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="stat-card-custom yellow-glow" onclick="openCatModal('not_out')">
+                    <div class="stat-card-custom-header">
+                        <div class="stat-card-icon-box">
+                            <i data-lucide="search"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-body">
+                        <span class="stat-card-title">SKU Tìm Thấy Chưa Kiểm</span>
+                        <span class="stat-card-val" id="statNotOut">—</span>
+                        <span class="stat-card-subtext" id="statNotOutSub">0% tổng SKU</span>
+                    </div>
+                    <div class="stat-card-chart">
+                        <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="card-chart">
+                            <defs>
+                                <linearGradient id="yellow-grad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="rgba(245, 158, 11, 0.25)" />
+                                    <stop offset="100%" stop-color="rgba(245, 158, 11, 0)" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,35 Q15,37 35,22 T65,30 T100,15 L100,40 L0,40 Z" fill="url(#yellow-grad)" />
+                            <path d="M0,35 Q15,37 35,22 T65,30 T100,15" fill="none" stroke="#f59e0b" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="statusBanner" style="display:none;">
+                <div class="banner loading" id="bannerInner">
+                    <i class='bx bx-loader-alt bx-spin'></i>
+                    <span>Đang phân tích số liệu chênh lệch...</span>
+                </div>
+            </div>
+
+            <!-- Search / Filter Custom Toolbar -->
+            <div class="toolbar-custom">
+                <div class="search-container">
+                    <i class='bx bx-search'></i>
+                    <input type="text" class="search-input-custom" id="searchInput" placeholder="Tìm theo SKU hoặc tên sản phẩm..." disabled>
+                </div>
+                <select class="filter-select-custom" id="gapFilter" disabled>
+                    <option value="all">Tất cả (Khớp & Lệch)</option>
+                    <option value="diff">Chỉ hiển thị lệch (Missing/Surplus)</option>
+                    <option value="missing">Chỉ hiển thị Thiếu</option>
+                    <option value="surplus">Chỉ hiển thị Dư</option>
+                    <option value="ok">Chỉ hiển thị Khớp</option>
+                </select>
+                <div class="badge-count" id="resultBadge">Sẵn sàng</div>
+            </div>
+
+            <!-- Highly Polished Main Table -->
+            <div class="table-custom-wrap">
+                <div style="overflow-x: auto; max-height: 60vh;">
+                    <table class="table-custom" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px; text-align: center;">#</th>
+                                <th style="width: 70px; text-align: center;"></th>
+                                <th data-col="name" id="thName">SẢN PHẨM / SKU <i class='bx bx-sort-alt-2'></i></th>
+                                <th data-col="sys" id="thSys">CẦN KIỂM <i class='bx bx-sort-alt-2'></i></th>
+                                <th data-col="act" id="thAct">ĐÃ KIỂM <i class='bx bx-sort-alt-2'></i></th>
+                                <th data-col="gap" id="thGap">CHƯA KIỂM <i class='bx bx-sort-alt-2'></i></th>
+                                <th style="text-align: center; width: 100px;">THAO TÁC</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="7" style="padding: 100px; text-align: center; color: #64748b;">
+                                    Đang tải và tính toán...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container" id="paginationWrap" style="display:none;">
+                    <div class="pagination-info" id="pageInfo"></div>
+                    <div class="pagination-buttons" id="pageBtns"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DETAIL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <button class="modal-close" id="modalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- CATEGORY MODAL -->
+    <div class="modal-overlay" id="catModalOverlay">
+        <div class="modal-box" id="catModalBox" style="max-width: 900px;">
+            <button class="modal-close" id="catModalCloseBtn"><i class='bx bx-x'></i></button>
+            <div class="modal-header" style="flex-direction: column; align-items: stretch; padding-bottom: 24px;" id="catModalHeader"></div>
+            <div class="modal-body" id="catModalBody" style="padding: 0;"></div>
+        </div>
+    </div>
+
+    <script src="../assets/js/page-nav.js"></script>
+    <script src="../assets/js/script-missing.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{try{if(typeof lucide!=='undefined')lucide.createIcons()}catch(e){}});</script>
+</body>
+</html>

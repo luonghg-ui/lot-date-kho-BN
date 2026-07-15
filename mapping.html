@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS - Mapping Kệ Nhanh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="settings.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+<body>
+    <div class="max-w-[1400px] mx-auto space-y-5">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-3 animate-fade-in">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-900 dark:text-white">Mapping Kệ Nhanh</h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Tra cứu vị trí kệ theo SKU, tên sản phẩm</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                <button id="btnSettings" class="p-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400" title="Cài đặt">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+                <button id="btnPageNav" onclick="openPageNavigator()" class="p-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" title="Tất cả trang">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </button>
+                <button id="themeToggle" class="theme-toggle" title="Chế độ tối/sáng">
+                    <i data-lucide="moon" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 animate-fade-in">
+            <div class="stat-card">
+                <div class="stat-icon bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng SKU</p>
+                    <p id="statTotal" class="text-xl font-bold text-slate-900 dark:text-white">-</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Đã Map</p>
+                    <p id="statMapped" class="text-xl font-bold text-slate-900 dark:text-white">-</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                    <i data-lucide="rows" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chưa Map</p>
+                    <p id="statUnmapped" class="text-xl font-bold text-slate-900 dark:text-white">-</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400">
+                    <i data-lucide="hash" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vị trí</p>
+                    <p id="statLocations" class="text-xl font-bold text-slate-900 dark:text-white">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Main -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Left: Search -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="glass-card p-5 focus-within:ring-2 focus-within:ring-emerald-200 dark:focus-within:ring-emerald-800 transition-all animate-fade-in">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 w-4 h-4"></i>
+                        <input type="text" id="searchInput" placeholder="Tìm theo SKU, tên SP hoặc mã kệ..."
+                            class="w-full input-field pl-11 text-sm" autocomplete="off">
+                    </div>
+                    <div id="suggestions" class="hidden mt-2"></div>
+                    <div class="flex gap-2 mt-3">
+                        <button id="btnLookup" class="btn-primary text-sm flex-1">
+                            <i data-lucide="search" class="w-4 h-4"></i> Tra cứu
+                        </button>
+                        <button id="btnRandom" class="btn-secondary text-sm" title="Xem ngẫu nhiên">
+                            <i data-lucide="shuffle" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card -->
+                <div id="productCard" class="glass-card p-5 border-l-[3px] border-l-emerald-500 hidden animate-scale-in">
+                    <div class="flex items-start gap-4">
+                        <div id="pImageContainer" class="hidden flex-shrink-0">
+                            <div class="w-16 h-16 rounded-xl border border-slate-200 dark:border-slate-700 p-1 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+                                <img id="pImage" src="" class="w-full h-full object-contain product-img-zoom">
+                            </div>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h2 id="pName" class="text-lg font-extrabold text-slate-900 dark:text-white truncate">Tên SP</h2>
+                            <p id="pSku" class="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase truncate">SKU: -</p>
+                            <div class="flex gap-1.5 mt-2">
+                                <span id="pGroup" class="badge badge-indigo text-[9px] hidden">-</span>
+                                <span id="pType" class="badge badge-slate text-[9px] hidden">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="glass-card p-4 animate-fade-in">
+                    <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i data-lucide="zap" class="w-3 h-3"></i> Tra nhanh
+                    </h3>
+                    <div class="flex flex-wrap gap-1.5" id="quickList"></div>
+                </div>
+            </div>
+
+            <!-- Right: Location Map -->
+            <div class="lg:col-span-7 animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="glass-card p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+                                <i data-lucide="map" class="w-4 h-4"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Sơ Đồ Kệ</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="resultCount" class="text-[10px] text-slate-400 dark:text-slate-500"></span>
+                            <button id="btnExpandAll" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition hidden" title="Mở rộng">
+                                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="results" class="space-y-2 min-h-[300px]">
+                        <div class="py-16 text-center text-slate-400 dark:text-slate-500">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/30">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-emerald-400"></i>
+                            </div>
+                            <p class="font-medium">Nhập SKU để tra cứu vị trí kệ</p>
+                            <p class="text-xs mt-1 opacity-60">Gõ tên, SKU hoặc mã kệ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/assets/js/page-nav.js"></script>
+    <script>
+        // Data
+        const DB_NAME = 'WMS_DB', STORE_NAME = 'products', DB_VERSION = 1;
+        let products = [];
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME))
+                        db.createObjectStore(STORE_NAME, { keyPath: 'sku' });
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function getProducts() {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const req = tx.objectStore(STORE_NAME).getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // DOM
+        const $ = id => document.getElementById(id);
+        const searchInput = $('searchInput');
+        const suggestions = $('suggestions');
+        const results = $('results');
+        const productCard = $('productCard');
+
+        function updateStats() {
+            const total = products.length;
+            const mapped = products.filter(p => p.location && p.location.trim()).length;
+            const locs = [...new Set(products.filter(p => p.location).map(p => p.location))];
+            $('statTotal').textContent = total.toLocaleString('vi-VN');
+            $('statMapped').textContent = mapped.toLocaleString('vi-VN');
+            $('statUnmapped').textContent = (total - mapped).toLocaleString('vi-VN');
+            $('statLocations').textContent = locs.length.toLocaleString('vi-VN');
+        }
+
+        function renderQuickList() {
+            const el = $('quickList');
+            const mapped = products.filter(p => p.location && p.location.trim());
+            const byLoc = {};
+            mapped.forEach(p => {
+                if (!byLoc[p.location]) byLoc[p.location] = [];
+                byLoc[p.location].push(p);
+            });
+            const topLocs = Object.entries(byLoc)
+                .sort((a, b) => b[1].length - a[1].length)
+                .slice(0, 12);
+            el.innerHTML = topLocs.map(([loc, items]) =>
+                `<button class="px-2.5 py-1.5 text-[10px] font-bold rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition whitespace-nowrap"
+                    onclick="searchByLocation('${loc}')">
+                    ${loc}
+                    <span class="ml-1 opacity-60">${items.length}</span>
+                </button>`
+            ).join('');
+        }
+
+        function filterProducts(query) {
+            const q = query.toLowerCase().trim();
+            if (!q) return [];
+            return products.filter(p =>
+                (p.sku && p.sku.toLowerCase().includes(q)) ||
+                (p.name && p.name.toLowerCase().includes(q)) ||
+                (p.location && p.location.toLowerCase().includes(q))
+            ).slice(0, 30);
+        }
+
+        function showSuggestions(query) {
+            const filtered = filterProducts(query);
+            if (!filtered.length || query.length < 1) {
+                suggestions.classList.add('hidden');
+                return;
+            }
+            suggestions.innerHTML = filtered.map(p =>
+                `<div class="suggestion-item !py-2.5" onclick="selectProduct('${p.sku}')">
+                    <div class="flex-grow min-w-0">
+                        <div class="font-bold text-sm text-theme-primary truncate">${p.name || 'N/A'}</div>
+                        <div class="text-[10px] font-mono text-theme-muted">${p.sku}</div>
+                    </div>
+                    ${p.location ? `<span class="text-[9px] font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded border border-emerald-200 dark:border-emerald-800 uppercase flex-shrink-0">${p.location}</span>`
+                                : `<span class="text-[9px] text-slate-400 italic">Chưa map</span>`}
+                </div>`
+            ).join('');
+            suggestions.classList.remove('hidden');
+        }
+
+        window.selectProduct = async (sku) => {
+            suggestions.classList.add('hidden');
+            searchInput.value = sku;
+            await lookupProduct(sku);
+        };
+
+        function searchByLocation(loc) {
+            searchInput.value = loc;
+            lookupByLocation(loc);
+        }
+
+        function lookupByLocation(loc) {
+            const matched = products.filter(p =>
+                p.location && p.location.toUpperCase() === loc.toUpperCase()
+            );
+            if (!matched.length) {
+                results.innerHTML = emptyResult('Không tìm thấy sản phẩm tại kệ này');
+                return;
+            }
+            renderResults(matched, `Kệ ${loc.toUpperCase()}`);
+        }
+
+        async function lookupProduct(sku) {
+            const p = products.find(x => x.sku === sku);
+            if (!p) {
+                results.innerHTML = emptyResult('Không tìm thấy sản phẩm');
+                return;
+            }
+
+            // Show product card
+            productCard.classList.remove('hidden');
+            $('pName').textContent = p.name || 'N/A';
+            $('pSku').textContent = `SKU: ${p.sku}`;
+
+            const groupEl = $('pGroup');
+            if (p.group) { groupEl.textContent = p.group; groupEl.classList.remove('hidden'); }
+            else groupEl.classList.add('hidden');
+
+            const typeEl = $('pType');
+            const isMed = (p.classification || '').includes('Thuốc') || (p.name || '').toLowerCase().includes('thuốc');
+            typeEl.textContent = isMed ? 'Thuốc' : 'Khác';
+            typeEl.className = `badge ${isMed ? 'badge-orange' : 'badge-slate'} text-[9px]`;
+            typeEl.classList.remove('hidden');
+
+            const imgEl = $('pImage');
+            const imgCont = $('pImageContainer');
+            if (p.image) { imgEl.src = p.image; imgCont.classList.remove('hidden'); }
+            else imgCont.classList.add('hidden');
+
+            // Show all products at same location
+            const sameLoc = p.location
+                ? products.filter(x => x.location === p.location && x.sku !== p.sku)
+                : [];
+            const allItems = p.location ? [p, ...sameLoc] : [p];
+            renderResults(allItems, p.location ? `Kệ ${p.location}` : 'Chưa có vị trí');
+        }
+
+        function renderResults(items, title) {
+            $('resultCount').textContent = `${items.length} sản phẩm`;
+            const loc = items.find(p => p.location)?.location || '';
+
+            let html = '';
+
+            // Location badge
+            if (loc) {
+                html += `
+                <div class="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800/50 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Vị trí</p>
+                        <p class="text-xl font-extrabold text-emerald-700 dark:text-emerald-300 font-mono">${loc}</p>
+                    </div>
+                    <button onclick="copyText('${loc}')"
+                        class="ml-auto p-2 bg-white dark:bg-slate-800 rounded-lg border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
+                        title="Copy mã kệ">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>`;
+            } else {
+                html += `<div class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800/50 mb-4 flex items-center gap-3">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500"></i>
+                    <span class="text-sm font-medium text-amber-700 dark:text-amber-300">Sản phẩm chưa được gán vị trí kệ</span>
+                </div>`;
+            }
+
+            // Product list
+            html += `<div class="space-y-2">`;
+            items.forEach((p, i) => {
+                const isMed = (p.classification || '').includes('Thuốc') || (p.name || '').toLowerCase().includes('thuốc');
+                html += `
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-700/50 hover:border-emerald-200 dark:hover:border-emerald-800 transition group"
+                    style="animation: fadeIn 0.3s ease ${i * 0.05}s both">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                        ${(p.sku || '??').slice(-2)}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-slate-900 dark:text-white truncate">${p.name || 'N/A'}</p>
+                        <p class="text-[10px] font-mono text-slate-400 dark:text-slate-500 truncate">${p.sku}</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        ${p.unit ? `<span class="text-[10px] text-slate-400 dark:text-slate-500">${p.unit}</span>` : ''}
+                        <span class="badge ${isMed ? 'badge-orange' : 'badge-slate'} text-[8px]">${isMed ? 'Thuốc' : 'KM'}</span>
+                        <button onclick="copyText('${p.sku}')"
+                            class="p-1.5 text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 opacity-0 group-hover:opacity-100 transition"
+                            title="Copy SKU">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+
+            results.innerHTML = html;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function emptyResult(msg) {
+            return `<div class="py-16 text-center text-slate-400 dark:text-slate-500">
+                <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                    <i data-lucide="frown" class="w-6 h-6"></i>
+                </div>
+                <p class="font-medium">${msg}</p>
+            </div>`;
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = $('toast') || createToast();
+                toast.querySelector('span').textContent = `✓ Đã copy "${text}"`;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2000);
+            });
+        }
+
+        function createToast() {
+            const el = document.createElement('div');
+            el.id = 'toast';
+            el.className = 'fixed bottom-6 right-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl px-5 py-3.5 translate-y-20 opacity-0 transition-all duration-300 rounded-xl flex items-center gap-3 z-[100] backdrop-blur-md';
+            el.innerHTML = `<div class="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400"><i data-lucide="check-circle" class="w-4 h-4"></i></div><span class="text-slate-700 dark:text-slate-300 font-semibold text-sm"></span>`;
+            document.body.appendChild(el);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            return el;
+        }
+
+        // Events
+        searchInput.addEventListener('input', (e) => showSuggestions(e.target.value));
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                suggestions.classList.add('hidden');
+                const q = searchInput.value.trim();
+                if (!q) return;
+                // Check if it's a location code
+                const byLoc = products.filter(p => p.location && p.location.toUpperCase() === q.toUpperCase());
+                if (byLoc.length > 1) lookupByLocation(q);
+                else {
+                    const p = products.find(x =>
+                        x.sku.toUpperCase() === q.toUpperCase() ||
+                        (x.name && x.name.toUpperCase().includes(q.toUpperCase()))
+                    );
+                    if (p) selectProduct(p.sku);
+                    else results.innerHTML = emptyResult('Không tìm thấy');
+                }
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestions.contains(e.target))
+                suggestions.classList.add('hidden');
+        });
+        $('btnLookup').addEventListener('click', () => {
+            const q = searchInput.value.trim();
+            if (q) searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+        });
+        $('btnRandom').addEventListener('click', () => {
+            const mapped = products.filter(p => p.location && p.location.trim());
+            if (!mapped.length) return;
+            const p = mapped[Math.floor(Math.random() * mapped.length)];
+            searchInput.value = p.sku;
+            selectProduct(p.sku);
+        });
+
+        // Init
+        async function init() {
+            try {
+                products = await getProducts();
+                if (!products.length) {
+                    results.innerHTML = `<div class="py-16 text-center text-slate-400 dark:text-slate-500">
+                        <p class="font-medium">Chưa có dữ liệu</p>
+                        <p class="text-xs mt-1">Về trang <a href="index.html" class="text-indigo-500 underline">kiểm kê</a> để đồng bộ dữ liệu trước</p>
+                    </div>`;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            updateStats();
+            renderQuickList();
+        }
+
+        // Theme - shared
+        const theme = initTheme();
+        const toggle = $('themeToggle');
+        if (toggle) {
+            updateThemeIcon(theme);
+            toggle.addEventListener('click', () => {
+                const next = toggleTheme();
+                updateThemeIcon(next);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
+        function updateThemeIcon(t) {
+            const icon = toggle.querySelector('i');
+            if (icon) icon.setAttribute('data-lucide', t === 'dark' ? 'sun' : 'moon');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // Settings button
+        $('btnSettings').addEventListener('click', openSettingsModal);
+
+        init();
+    </script>
+</body>
+</html>

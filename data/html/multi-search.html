@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu Nhiều Sản Phẩm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../../style.css">
+    <script src="../../settings.js"></script>
+    <style>
+        .sku-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'Inter', monospace;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary);
+            border: 1px solid rgba(99,102,241,0.15);
+            transition: all 0.2s ease;
+        }
+        .sku-tag:hover {
+            background: rgba(99,102,241,0.12);
+        }
+        .sku-tag .remove {
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sku-tag .remove:hover { opacity: 1; color: var(--accent-danger); }
+        .result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: rgba(99,102,241,0.2);
+            transform: translateY(-2px);
+        }
+        .result-card.loading { opacity: 0.6; }
+        .result-card.error { border-left: 4px solid var(--accent-danger); }
+        .result-card.success { border-left: 4px solid var(--accent-success); }
+        .sku-input-area {
+            min-height: 140px;
+            resize: vertical;
+            font-family: 'Inter', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            transition: border-color 0.2s ease;
+        }
+        .sku-input-area:focus {
+            border-color: var(--primary);
+        }
+        
+        .location-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(16,185,129,0.1);
+            color: var(--accent-success);
+            border: 1px solid rgba(16,185,129,0.15);
+        }
+        .lot-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(99,102,241,0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99,102,241,0.15);
+        }
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .toast-fixed {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 999;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .toast-fixed.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loc-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+        .loc-table th {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--card-border);
+            text-align: left;
+        }
+        .loc-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--card-border);
+            transition: background 0.2s;
+        }
+        .loc-table tbody tr:hover td { background: var(--primary-bg); }
+        .loc-table td:last-child, .loc-table th:last-child { text-align: right; }
+        .loc-table tr:last-child td { border-bottom: none; }
+
+        .btn-primary {
+            background: var(--primary) !important;
+            color: #fff !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+        }
+        .btn-primary:hover {
+            opacity: 0.9 !important;
+        }
+        .btn-secondary {
+            background: transparent !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--card-border) !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-secondary:hover {
+            background: var(--card-bg) !important;
+            border-color: rgba(99,102,241,0.3) !important;
+            color: var(--primary) !important;
+        }
+
+        .stat-card-custom {
+            padding: 16px;
+            text-align: left;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .stat-card-custom:hover {
+            border-color: rgba(99,102,241,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .result-card { animation: fadeSlideUp 0.3s ease both; }
+        .result-card:nth-child(1) { animation-delay: 0s; }
+        .result-card:nth-child(2) { animation-delay: 0.05s; }
+        .result-card:nth-child(3) { animation-delay: 0.1s; }
+        .result-card:nth-child(4) { animation-delay: 0.15s; }
+        .result-card:nth-child(5) { animation-delay: 0.2s; }
+        .result-card:nth-child(6) { animation-delay: 0.25s; }
+        .result-card:nth-child(7) { animation-delay: 0.3s; }
+        .result-card:nth-child(8) { animation-delay: 0.35s; }
+        .result-card:nth-child(9) { animation-delay: 0.4s; }
+        .result-card:nth-child(10) { animation-delay: 0.45s; }
+
+        /* Custom Styles for Modern Dashboard & Sidebar */
+        :root {
+            --sidebar-width: 100px;
+        }
+        body {
+            background-color: #080c14;
+            color: #f8fafc;
+            font-family: 'Inter', 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .app-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0d1220;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            flex-shrink: 0;
+            justify-content: space-between;
+        }
+        .sidebar-brand {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+            margin-bottom: 32px;
+        }
+        .sidebar-brand i, .sidebar-brand svg {
+            width: 24px;
+            height: 24px;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .sidebar-item {
+            width: 76px;
+            height: 76px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            text-decoration: none;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        .sidebar-item i, .sidebar-item svg {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.3s;
+        }
+        .sidebar-item span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .sidebar-item:hover {
+            color: #a78bfa;
+            background: rgba(168, 85, 247, 0.08);
+        }
+        .sidebar-item:hover i, .sidebar-item:hover svg {
+            transform: scale(1.1);
+        }
+        .sidebar-item.active {
+            color: #ffffff;
+            background: rgba(139, 92, 246, 0.18);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            box-shadow: inset 0 0 12px rgba(139, 92, 246, 0.1);
+        }
+        .sidebar-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+        .status-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        .status-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            line-height: 1.2;
+        }
+        
+        /* Main view wrapper */
+        .main-wrapper {
+            flex-grow: 1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+    </style>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+</head>
+<body>
+    <div class="mesh-bg"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo-section" style="display:flex; flex-direction:column; align-items:center;">
+                <div class="sidebar-brand">
+                    <i data-lucide="radar"></i>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="data-missing.html" class="sidebar-item">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="report-missing.html" class="sidebar-item">
+                    <i data-lucide="line-chart"></i>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="doisoat.html" class="sidebar-item">
+                    <i data-lucide="shield-check"></i>
+                    <span>Đối soát</span>
+                </a>
+                <a href="candate.html" class="sidebar-item">
+                    <i data-lucide="bell"></i>
+                    <span>Cảnh báo</span>
+                </a>
+                <a href="#" class="sidebar-item" id="tokenBtn">
+                    <i data-lucide="settings"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Kho Dữ Liệu</span>
+                    <span class="status-name">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main View Area -->
+        <main class="main-wrapper">
+    <!-- Top bar -->
+    <header style="max-width:1600px;margin:0 auto;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 25px rgba(99,102,241,0.35);">
+                <i data-lucide="search" style="width:20px;height:20px;color:white;"></i>
+            </div>
+            <div>
+                <h1 style="font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Tra cứu Nhiều Sản Phẩm</h1>
+                <p style="color:var(--text-muted);font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Tìm kiếm hàng loạt SKU – tồn kho, vị trí, lot</p>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button id="themeToggle" title="Chế độ tối/sáng" style="width:40px;height:40px;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all 0.25s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(99,102,241,0.3)';this.style.color='var(--primary)';" onmouseout="this.style.borderColor='var(--card-border)';this.style.color='var(--text-secondary)';">
+                <i class='bx bx-moon' style="font-size:18px;"></i>
+            </button>
+            <button onclick="openSettingsModal()" title="Cài đặt" style="width:40px;height:40px;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all 0.25s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(99,102,241,0.3)';this.style.color='var(--primary)';" onmouseout="this.style.borderColor='var(--card-border)';this.style.color='var(--text-secondary)';">
+                <i data-lucide="settings" style="width:18px;height:18px;"></i>
+            </button>
+            <button onclick="openPageNavigator()" title="Tất cả trang" style="width:40px;height:40px;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all 0.25s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(99,102,241,0.3)';this.style.color='var(--primary)';" onmouseout="this.style.borderColor='var(--card-border)';this.style.color='var(--text-secondary)';">
+                <i data-lucide="layers" style="width:18px;height:18px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <div style="max-width:1600px;margin:0 auto;">
+
+        <!-- Input Area -->
+        <div class="glass-card" style="padding:0;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px;border-bottom:1px solid var(--card-border);">
+                <h3 style="font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="clipboard-list" style="width:16px;height:16px;color:var(--primary);"></i>
+                    Nhập danh sách SKU
+                </h3>
+                <div style="display:flex;gap:6px;">
+                    <button id="btnClearInput" class="btn-secondary" style="padding:7px 16px;font-size:11px;border-radius:8px;">
+                        <i class='bx bx-trash' style="font-size:12px;"></i> Xóa
+                    </button>
+                    <button id="btnSearch" class="btn-primary" style="padding:7px 20px;font-size:11px;border-radius:8px;">
+                        <i data-lucide="search" style="width:12px;height:12px;"></i> Tra cứu
+                    </button>
+                </div>
+            </div>
+            <div style="padding:16px 20px 14px;">
+                <textarea id="skuInput" class="sku-input-area input-field" style="width:100%;min-height:130px;resize:vertical;font-family:'Inter',monospace;font-size:13px;line-height:1.6;background:var(--input-bg);border:1.5px solid var(--card-border);color:var(--text-main);border-radius:10px;padding:12px 14px;outline:none;transition:border-color 0.25s;" placeholder="Nhập SKU, mỗi dòng một mã&#10;hoặc dán danh sách cách nhau bằng dấu phẩy / tab / xuống dòng&#10;&#10;VD:&#10;DSOQEM8DN9.ALER2AXH&#10;DSOQEM8DN9.CELQ61PG&#10;Z3STYACBVI.NAK-TIF-05" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--card-border)'"></textarea>
+                <div id="skuTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;min-height:28px;"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;">
+                    <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-muted);">
+                        <span><i class='bx bx-list-ol'></i> <span id="skuCount">0</span> SKU</span>
+                        <span id="formatHint" style="padding:2px 10px;border-radius:20px;background:var(--primary-bg);color:var(--primary);font-weight:600;font-size:10px;">Nhập mỗi dòng 1 SKU</span>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button id="btnPaste" class="btn-secondary" style="padding:7px 16px;font-size:11px;border-radius:8px;">
+                            <i class='bx bx-clipboard' style="font-size:12px;"></i> Dán
+                        </button>
+                        <button id="btnExample" class="btn-secondary" style="padding:7px 16px;font-size:11px;border-radius:8px;">
+                            <i class='bx bx-list-plus' style="font-size:12px;"></i> Ví dụ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div id="progressArea" style="display:none;margin-bottom:20px;">
+            <div class="glass-card" style="padding:16px 20px;border-left:3px solid var(--primary);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <i class='bx bx-loader-alt bx-spin' style="color:var(--primary);font-size:18px;"></i>
+                        <span style="font-weight:600;font-size:14px;color:var(--text-main);">Đang tra cứu...</span>
+                    </div>
+                    <span id="progressText" style="font-weight:700;font-size:14px;color:var(--text-secondary);font-variant-numeric:tabular-nums;">0 / 0</span>
+                </div>
+                <div style="height:6px;background:var(--card-border);border-radius:3px;overflow:hidden;">
+                    <div id="progressFill" style="height:100%;background:linear-gradient(135deg,#6366F1,#A855F7);border-radius:3px;transition:width 0.4s ease;width:0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div id="statsArea" style="display:none;margin-bottom:20px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+                <div class="stat-card-custom" style="border-left:3px solid var(--accent-success);">
+                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,0.1);color:var(--accent-success);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;"><i class='bx bx-check-circle'></i></div>
+                    <div>
+                        <div id="statFound" style="font-size:1.25rem;font-weight:700;color:var(--text-main);line-height:1;">0</div>
+                        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">Tìm thấy</div>
+                    </div>
+                </div>
+                <div class="stat-card-custom" style="border-left:3px solid var(--accent-danger);">
+                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(239,68,68,0.1);color:var(--accent-danger);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;"><i class='bx bx-x-circle'></i></div>
+                    <div>
+                        <div id="statNotFound" style="font-size:1.25rem;font-weight:700;color:var(--text-main);line-height:1;">0</div>
+                        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">Không tìm thấy</div>
+                    </div>
+                </div>
+                <div class="stat-card-custom" style="border-left:3px solid var(--accent-warning);">
+                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,0.1);color:var(--accent-warning);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;"><i class='bx bx-error'></i></div>
+                    <div>
+                        <div id="statError" style="font-size:1.25rem;font-weight:700;color:var(--text-main);line-height:1;">0</div>
+                        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">Lỗi</div>
+                    </div>
+                </div>
+                <div class="stat-card-custom" style="border-left:3px solid var(--primary);">
+                    <div style="width:36px;height:36px;border-radius:8px;background:rgba(99,102,241,0.1);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;"><i class='bx bx-map-pin'></i></div>
+                    <div>
+                        <div id="statTotalLocations" style="font-size:1.25rem;font-weight:700;color:var(--text-main);line-height:1;">0</div>
+                        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">Tổng vị trí kệ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsArea" style="display:none;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 4px;">
+                <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="database" style="width:16px;height:16px;color:var(--primary);"></i>
+                    Kết quả tra cứu
+                </h3>
+                <div style="display:flex;gap:6px;">
+                    <button id="btnExportResult" class="btn-secondary" style="padding:7px 16px;font-size:11px;border-radius:8px;">
+                        <i class='bx bxs-file-export' style="font-size:12px;"></i> Xuất Excel
+                    </button>
+                    <button id="btnCopyResult" class="btn-secondary" style="padding:7px 16px;font-size:11px;border-radius:8px;">
+                        <i class='bx bx-copy'></i> Copy
+                    </button>
+                </div>
+            </div>
+            <div id="resultsContainer" class="results-container"></div>
+        </div>
+    </div>
+
+    <!-- Page Navigator Modal -->
+    <div id="pageNavModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,6,23,0.8);backdrop-filter:blur(20px);align-items:center;justify-content:center;padding:20px;">
+        <div id="pageNavBox" style="width:100%;max-width:480px;border-radius:28px;overflow:hidden;background:linear-gradient(145deg,rgba(30,41,59,0.97),rgba(15,23,42,0.99));border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 100px rgba(0,0,0,0.8);transform:scale(0.9) translateY(20px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+            <div style="padding:24px 24px 18px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(99,102,241,0.4);">
+                        <i data-lucide="layers" style="width:18px;height:18px;color:white;"></i>
+                    </div>
+                    <div>
+                        <p style="font-size:1rem;font-weight:800;color:#fff;">Chuyển Trang</p>
+                        <p style="font-size:0.65rem;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Điều hướng hệ thống</p>
+                    </div>
+                </div>
+                <button onclick="closePageNavigator()" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94A3B8;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#94A3B8';">
+                    <i data-lucide="x" style="width:16px;height:16px;"></i>
+                </button>
+            </div>
+            <div style="padding:16px 24px 24px;display:flex;flex-direction:column;gap:8px;">
+                <p style="font-size:0.6rem;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:0.15em;margin:6px 0 2px;">── WMS Kho HN ──</p>
+                <a href="../../index.html" onclick="closePageNavigator()" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.25s;" onmouseover="this.style.background='rgba(99,102,241,0.12)';this.style.borderColor='rgba(99,102,241,0.35)';this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='translateX(0)';">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,0.4);"><i data-lucide="package" style="width:16px;height:16px;color:white;"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.88rem;font-weight:700;color:#E2E8F0;">Kiểm Kê Hàng Ngày</p>
+                        <p style="font-size:0.7rem;color:#475569;">Nhập liệu kiểm kê tồn kho thực tế</p>
+                    </div>
+                </a>
+                <a href="../../mapping.html" onclick="closePageNavigator()" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.25s;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='rgba(16,185,129,0.3)';this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='translateX(0)';">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(16,185,129,0.3);"><i data-lucide="map-pin" style="width:16px;height:16px;color:white;"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.88rem;font-weight:700;color:#E2E8F0;">Mapping Kệ Nhanh</p>
+                        <p style="font-size:0.7rem;color:#475569;">Tra cứu vị trí kệ theo SKU</p>
+                    </div>
+                </a>
+                <p style="font-size:0.6rem;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:0.15em;margin:8px 0 2px;">── Kho Thuocsi ──</p>
+                <a href="candate.html" onclick="closePageNavigator()" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.25s;" onmouseover="this.style.background='rgba(245,158,11,0.1)';this.style.borderColor='rgba(245,158,11,0.3)';this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='translateX(0)';">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(245,158,11,0.3);"><i data-lucide="calendar" style="width:16px;height:16px;color:white;"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.88rem;font-weight:700;color:#E2E8F0;">Sản Phẩm Cận Date</p>
+                        <p style="font-size:0.7rem;color:#475569;">Lọc sản phẩm HSD dưới 1 năm</p>
+                    </div>
+                </a>
+                <a href="data-missing.html" onclick="closePageNavigator()" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.25s;" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.borderColor='rgba(239,68,68,0.3)';this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='translateX(0)';">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#EF4444,#DC2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(239,68,68,0.3);"><i data-lucide="radar" style="width:16px;height:16px;color:white;"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.88rem;font-weight:700;color:#E2E8F0;">Data Missing – Tính Lệch</p>
+                        <p style="font-size:0.7rem;color:#475569;">Khớp dữ liệu kiểm kê vs hệ thống</p>
+                    </div>
+                </a>
+                <a href="doisoat.html" onclick="closePageNavigator()" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.25s;" onmouseover="this.style.background='rgba(139,92,246,0.1)';this.style.borderColor='rgba(139,92,246,0.3)';this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='translateX(0)';">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,0.3);"><i data-lucide="shield-check" style="width:16px;height:16px;color:white;"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.88rem;font-weight:700;color:#E2E8F0;">Đối Soát Vender</p>
+                        <p style="font-size:0.7rem;color:#475569;">Quản lý sản lượng & vi phạm</p>
+                    </div>
+                </a>
+                <a href="multi-search.html" onclick="closePageNavigator()" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.35);text-decoration:none;transition:all 0.25s;" onmouseover="this.style.transform='translateX(4px)';" onmouseout="this.style.transform='translateX(0)';">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0EA5E9,#0284C7);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(14,165,233,0.3);"><i data-lucide="search" style="width:16px;height:16px;color:white;"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.88rem;font-weight:700;color:#E2E8F0;">Tra cứu Nhiều Sản Phẩm</p>
+                        <p style="font-size:0.7rem;color:#475569;">Tra cứu hàng loạt SKU – tồn kho, vị trí, lot</p>
+                    </div>
+                    <span style="font-size:0.58rem;font-weight:700;color:#7DD3FC;background:rgba(14,165,233,0.2);padding:2px 9px;border-radius:20px;border:1px solid rgba(14,165,233,0.35);flex-shrink:0;">● Hiện tại</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast-fixed">
+        <i id="toastIcon" class='bx bx-check-circle' style="color:var(--accent-success);font-size:1.25rem;"></i>
+        <span id="toastMsg" style="color:var(--text-main);">Done</span>
+    </div>
+
+    <script>
+    // ─── Theme ───
+    (function() {
+        const theme = localStorage.getItem('wms_theme') || 'light';
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        const toggle = document.getElementById('themeToggle');
+        if (toggle) {
+            const icon = toggle.querySelector('i');
+            if (theme === 'dark') icon.className = 'bx bx-sun';
+            toggle.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                const next = isDark ? 'dark' : 'light';
+                localStorage.setItem('wms_theme', next);
+                icon.className = isDark ? 'bx bx-sun' : 'bx bx-moon';
+                try {
+                    if (typeof syncChannel !== 'undefined' && syncChannel) {
+                        syncChannel.postMessage({ type: 'THEME_UPDATED', sender: 'Multi Search', theme: next });
+                    }
+                } catch(e) {}
+            });
+        }
+    })();
+
+    // ─── State ───
+    let parsedSkus = [];
+    let results = [];
+
+    // ─── Helpers ───
+    function getProxyUrl() {
+        return localStorage.getItem('wms_proxy_url') || 'http://localhost:8081';
+    }
+
+    function getProxiedImageUrl(url) {
+        if (!url) return '';
+        let target = url;
+        if (url.includes('storage.googleapis.com/')) {
+            target = url.replace('storage.googleapis.com/', 'cdn-gcs.thuocsi.vn/');
+        }
+        if (target.startsWith('http')) {
+            return getProxyUrl() + '/image?url=' + encodeURIComponent(target);
+        }
+        return target;
+    }
+
+    function parseSkus(text) {
+        const raw = text.trim();
+        if (!raw) return [];
+        // Split by newline, comma, tab, semicolon
+        const items = raw.split(/[\n,;\t]+/).map(s => s.trim()).filter(s => s.length > 0);
+        // Deduplicate
+        return [...new Set(items)];
+    }
+
+    function renderTags() {
+        const container = document.getElementById('skuTags');
+        if (parsedSkus.length === 0) {
+            container.innerHTML = '';
+            document.getElementById('skuCount').textContent = '0';
+            return;
+        }
+        container.innerHTML = parsedSkus.map((sku, i) => `
+            <span class="sku-tag">
+                ${sku}
+                <span class="remove" data-index="${i}"><i class='bx bx-x'></i></span>
+            </span>
+        `).join('');
+        document.getElementById('skuCount').textContent = parsedSkus.length;
+        container.querySelectorAll('.remove').forEach(el => {
+            el.addEventListener('click', () => {
+                const idx = parseInt(el.dataset.index);
+                parsedSkus.splice(idx, 1);
+                renderTags();
+                document.getElementById('skuInput').value = parsedSkus.join('\n');
+            });
+        });
+    }
+
+    // ─── API ───
+    async function fetchDetail(sku) {
+        const base = getProxyUrl();
+        const res = await fetch(`${base}/wms/detail?sku=${encodeURIComponent(sku)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+    }
+
+    async function fetchMove(sku) {
+        try {
+            const base = getProxyUrl();
+            const res = await fetch(`${base}/wms/move?sku=${encodeURIComponent(sku)}`);
+            if (!res.ok) return [];
+            const data = await res.json();
+            return data.data || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    // ─── Search ───
+    async function doSearch() {
+        const btn = document.getElementById('btnSearch');
+        const input = document.getElementById('skuInput');
+        const text = input.value;
+        parsedSkus = parseSkus(text);
+        if (parsedSkus.length === 0) {
+            showToast('Vui lòng nhập ít nhất 1 SKU', 'warning');
+            return;
+        }
+        renderTags();
+
+        // Show progress
+        document.getElementById('progressArea').style.display = '';
+        document.getElementById('statsArea').style.display = 'none';
+        document.getElementById('resultsArea').style.display = 'none';
+        document.getElementById('resultsContainer').innerHTML = '';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Đang tra cứu...';
+
+        const total = parsedSkus.length;
+        results = [];
+
+        for (let i = 0; i < total; i++) {
+            const sku = parsedSkus[i];
+            document.getElementById('progressText').textContent = `${i + 1} / ${total}`;
+            document.getElementById('progressFill').style.width = `${((i + 1) / total) * 100}%`;
+
+            const result = { sku, status: 'error', data: null, error: '' };
+
+            try {
+                const detailData = await fetchDetail(sku);
+                const detail = detailData.data || detailData.skuData;
+                // Also check skuPhysicalInfo for extra product data
+                const physInfo = detailData.skuPhysicalInfo || {};
+                // Try to find group from multiple sources
+                const groupSrc = detail || physInfo || {};
+                const group = groupSrc.categoryName || groupSrc.group || groupSrc.category || groupSrc.categoryId || groupSrc.nhom || groupSrc.nhomHang || groupSrc.productGroup || groupSrc.productCategory || detailData.group || '';
+                if (detail) {
+                    const locations = detailData.skuLocations || [];
+                    const lots = detailData.skuLotDate || [];
+
+                    // Try move API for richer lot data
+                    let moveLots = [];
+                    try { const ml = await fetchMove(sku); if (ml.length > 0) moveLots = ml; } catch(e) {}
+
+                    const liveQty = detail.stockQuantity || detail.physicalQuantity || detail.totalQuantity || detail.quantity || 0;
+
+                    let image = '';
+                    if (detail.imageUrl) image = detail.imageUrl;
+                    else if (detail.image) image = detail.image;
+                    else if (detail.imageUrls && detail.imageUrls.length > 0) image = detail.imageUrls[0];
+                    else if (detail.images && detail.images.length > 0) {
+                        image = typeof detail.images[0] === 'string' ? detail.images[0] : (detail.images[0].url || '');
+                    }
+                    if (!image && detail.productId) {
+                        image = `https://storage.googleapis.com/buy-med/production/product/${detail.productId}.jpg`;
+                    }
+                    if (image && image.startsWith('/')) image = 'https://cdn.thuocsi.vn' + image;
+                    if (image && !image.startsWith('http')) image = 'https://cdn.thuocsi.vn/product/' + image;
+
+                    const detailStr = JSON.stringify(detail);
+                    let finalGroup = group;
+                    let finalIsMedicine = detailStr.includes('Thuốc') || detailStr.includes('THUOC') || detailStr.includes('DRUG') || (detail.name || '').toLowerCase().includes('thuốc');
+
+                    let mainLocation = '';
+                    if (locations.length > 0) {
+                        const priorityLoc = locations.find(loc => loc.locationCode && loc.locationCode.includes('I1A'));
+                        mainLocation = priorityLoc ? priorityLoc.locationCode : locations[0].locationCode;
+                    }
+
+                    result.status = 'success';
+                    result.data = {
+                        name: detail.productName || detail.name || sku,
+                        systemQty: liveQty,
+                        availableQty: detail.availableQuantity || 0,
+                        onHoldQty: detail.onHoldQuantity || 0,
+                        unit: detail.unit || 'Cái',
+                        location: mainLocation,
+                        locations,
+                        lots: moveLots.length > 0 ? moveLots : lots,
+                        image,
+                        isMedicine: finalIsMedicine,
+                        group: finalGroup,
+                    };
+                } else {
+                    result.error = 'Không có dữ liệu chi tiết (token hết hạn?)';
+                }
+            } catch (e) {
+                result.error = e.message || 'Lỗi kết nối';
+            }
+
+            results.push(result);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bx bx-search-alt-2"></i> Tra cứu';
+        document.getElementById('progressArea').style.display = 'none';
+        renderResults();
+    }
+
+    // ─── Render Results ───
+    function renderResults() {
+        const container = document.getElementById('resultsContainer');
+        const statsArea = document.getElementById('statsArea');
+        const resultsArea = document.getElementById('resultsArea');
+
+        const found = results.filter(r => r.status === 'success');
+        const notFound = results.filter(r => r.status === 'error' && r.error.includes('Không có dữ liệu'));
+        const errors = results.filter(r => r.status === 'error' && !r.error.includes('Không có dữ liệu'));
+        const totalLocs = found.reduce((sum, r) => sum + (r.data.locations ? r.data.locations.length : 0), 0);
+
+        document.getElementById('statFound').textContent = found.length;
+        document.getElementById('statNotFound').textContent = notFound.length;
+        document.getElementById('statError').textContent = errors.length;
+        document.getElementById('statTotalLocations').textContent = totalLocs;
+
+        statsArea.style.display = '';
+        resultsArea.style.display = '';
+
+        if (results.length === 0) {
+            container.innerHTML = '<div class="glass-card" style="text-align:center;padding:3rem;"><i class="bx bx-search-alt" style="font-size:2.5rem;color:var(--text-muted);"></i><p style="margin-top:0.75rem;font-weight:600;color:var(--text-muted);">Không có kết quả</p></div>';
+            return;
+        }
+
+        container.innerHTML = results.map((r, idx) => {
+            if (r.status === 'success') {
+                const d = r.data;
+                const imgUrl = getProxiedImageUrl(d.image);
+                const locs = d.locations || [];
+                const lots = d.lots || [];
+                const groupText = d.group ? (d.group.toString().startsWith('Nhóm') ? d.group : `Nhóm ${d.group}`) : '';
+                const typeBadge = d.isMedicine
+                    ? '<span class="badge badge-orange" style="font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;">Thuốc</span>'
+                    : '<span class="badge badge-slate" style="font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;">Khác</span>';
+                const groupBadge = groupText
+                    ? `<span class="badge badge-indigo" style="font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;">${groupText}</span>`
+                    : '';
+                const mainLoc = d.location || '—';
+                const shelfCount = locs.length;
+                const lotCount = lots.length;
+                const hasImage = imgUrl && imgUrl !== 'https://via.placeholder.com/52';
+
+                return `
+                <div class="result-card success">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+                        <div style="min-width:0;flex:1;">
+                            <h2 style="font-size:1.125rem;font-weight:700;color:var(--text-main);margin-bottom:4px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.name}</h2>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <p style="color:var(--text-muted);font-family:'Inter',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;">SKU: <span style="color:var(--text-main);">${r.sku}</span></p>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px;flex-wrap:wrap;justify-content:flex-end;">${groupBadge}${typeBadge}</div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;background:var(--primary-bg);border-radius:12px;padding:12px 16px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;">
+                            <div>
+                                <p class="info-label" style="margin-bottom:4px;font-size:11px;font-weight:600;color:var(--text-muted);"><i class='bx bx-cube' style="margin-right:4px;"></i> Tồn Hệ Thống</p>
+                                <div style="display:flex;align-items:baseline;gap:4px;">
+                                    <span style="font-size:1.5rem;font-weight:700;color:var(--text-main);line-height:1;font-family:'Outfit',sans-serif;">${d.systemQty.toLocaleString('vi-VN')}</span>
+                                    <span style="font-size:11px;font-weight:500;color:var(--text-muted);">${d.unit}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="info-label" style="margin-bottom:4px;font-size:11px;font-weight:600;color:var(--text-muted);"><i class='bx bx-target-lock' style="margin-right:4px;"></i> Vị trí chính</p>
+                                <p style="font-size:1.125rem;font-weight:700;color:var(--accent-success);font-family:'Inter',monospace;">${mainLoc}</p>
+                            </div>
+                        </div>
+                        ${hasImage ? `
+                        <div style="width:64px;height:64px;border-radius:10px;border:1px solid var(--card-border);padding:4px;background:#fff;overflow:hidden;flex-shrink:0;">
+                            <img src="${imgUrl}" alt="" style="width:100%;height:100%;object-fit:contain;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onerror="this.parentElement.style.display='none'">
+                        </div>` : ''}
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+                        <div style="padding:10px;background:var(--card-bg);border-radius:8px;text-align:center;border:1px solid var(--card-border);">
+                            <p style="font-size:1rem;font-weight:700;color:var(--primary);font-family:'Outfit',sans-serif;line-height:1.2;">${d.availableQty.toLocaleString('vi-VN')}</p>
+                            <p style="font-size:9px;font-weight:600;color:var(--text-muted);margin-top:2px;">Có sẵn</p>
+                        </div>
+                        <div style="padding:10px;background:var(--card-bg);border-radius:8px;text-align:center;border:1px solid var(--card-border);">
+                            <p style="font-size:1rem;font-weight:700;color:var(--accent-warning);font-family:'Outfit',sans-serif;line-height:1.2;">${d.onHoldQty.toLocaleString('vi-VN')}</p>
+                            <p style="font-size:9px;font-weight:600;color:var(--text-muted);margin-top:2px;">Đang giữ</p>
+                        </div>
+                        <div style="padding:10px;background:var(--card-bg);border-radius:8px;text-align:center;border:1px solid var(--card-border);">
+                            <p style="font-size:1rem;font-weight:700;color:var(--text-secondary);font-family:'Outfit',sans-serif;line-height:1.2;">${shelfCount}</p>
+                            <p style="font-size:9px;font-weight:600;color:var(--text-muted);margin-top:2px;">Số Kệ</p>
+                        </div>
+                        <div style="padding:10px;background:var(--card-bg);border-radius:8px;text-align:center;border:1px solid var(--card-border);">
+                            <p style="font-size:1rem;font-weight:700;color:var(--accent-success);font-family:'Outfit',sans-serif;line-height:1.2;">${lotCount}</p>
+                            <p style="font-size:9px;font-weight:600;color:var(--text-muted);margin-top:2px;">Số Lot</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+                        ${locs.length > 0 ? `
+                        <div class="glass-card" style="padding:0;overflow:hidden;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--card-border);" onmouseover="this.style.background='var(--primary-bg)'" onmouseout="this.style.background='transparent'"
+                                 onclick="toggleSection('locSection_${idx}', 'locEye_${idx}')">
+                                <h3 style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px;">
+                                    <i data-lucide="map-pin" style="width:12px;height:12px;"></i> Vị trí kệ có hàng
+                                </h3>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span style="font-size:10px;font-weight:700;color:var(--text-muted);">${locs.length} vị trí</span>
+                                    <i id="locEye_${idx}" data-lucide="eye-off" style="width:14px;height:14px;"></i>
+                                </div>
+                            </div>
+                            <div id="locSection_${idx}" style="overflow-x:auto;display:none;">
+                                <table class="loc-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kệ</th>
+                                            <th style="text-align:right;">Tồn kho</th>
+                                            <th style="text-align:right;">Có sẵn</th>
+                                            <th style="text-align:right;">Giữ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${locs.map(l => `
+                                            <tr>
+                                                <td><span class="location-chip"><i class='bx bx-current-location'></i> ${l.locationCode}</span></td>
+                                                <td style="text-align:right;">${(l.stockQuantity || 0).toLocaleString('vi-VN')}</td>
+                                                <td style="text-align:right;color:var(--accent-success);font-weight:600;">${(l.availableQuantity || 0).toLocaleString('vi-VN')}</td>
+                                                <td style="text-align:right;color:var(--accent-warning);font-weight:600;">${(l.onHoldQuantity || 0).toLocaleString('vi-VN')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>` : ''}
+
+                        ${lots.length > 0 ? `
+                        <div class="glass-card" style="padding:0;overflow:hidden;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--card-border);" onmouseover="this.style.background='var(--primary-bg)'" onmouseout="this.style.background='transparent'"
+                                 onclick="toggleSection('lotSection_${idx}', 'lotEye_${idx}')">
+                                <h3 style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px;">
+                                    <i data-lucide="calendar" style="width:12px;height:12px;"></i> Lot / Hạn sử dụng
+                                </h3>
+                                <i id="lotEye_${idx}" data-lucide="eye-off" style="width:14px;height:14px;"></i>
+                            </div>
+                            <div id="lotSection_${idx}" style="overflow-x:auto;display:none;">
+                                <table class="loc-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Lot</th>
+                                            <th>HSD</th>
+                                            <th style="text-align:right;">Nhập</th>
+                                            <th style="text-align:right;">Có sẵn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${lots.map(l => `
+                                            <tr>
+                                                <td><span class="lot-chip">${l.lot}</span></td>
+                                                <td>${l.expiredDate || '-'}</td>
+                                                <td style="text-align:right;">${(l.inQuantity || 0).toLocaleString('vi-VN')}</td>
+                                                <td style="text-align:right;color:var(--accent-success);font-weight:600;">${(l.availableQuantity || 0).toLocaleString('vi-VN')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            } else {
+                const isNoData = r.error.includes('Không có dữ liệu');
+                return `
+                <div class="result-card error">
+                    <div class="flex items-center gap-3">
+                        <div style="width:50px;height:50px;border-radius:12px;background:var(--badge-danger-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class='bx bx-x-circle' style="color:var(--accent-danger);font-size:1.5rem;"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <code style="font-weight:700;font-size:14px;color:var(--text-main);">${r.sku}</code>
+                            <p style="font-size:12px;color:var(--accent-danger);margin-top:3px;">${isNoData ? 'Không tìm thấy dữ liệu (token?)' : r.error}</p>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        }).join('');
+    }
+
+    function toggleSection(id, iconId) {
+        const content = document.getElementById(id);
+        const icon = document.getElementById(iconId);
+        if (!content || !icon) return;
+        if (content.style.display === 'none') {
+            content.style.display = '';
+            icon.setAttribute('data-lucide', 'eye');
+        } else {
+            content.style.display = 'none';
+            icon.setAttribute('data-lucide', 'eye-off');
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // ─── Toast ───
+    let toastTimer;
+
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const msgEl = document.getElementById('toastMsg');
+        msgEl.textContent = msg;
+        if (type === 'warning') {
+            icon.className = 'bx bx-error-circle';
+            icon.style.color = 'var(--accent-warning)';
+        } else if (type === 'error') {
+            icon.className = 'bx bx-x-circle';
+            icon.style.color = 'var(--accent-danger)';
+        } else {
+            icon.className = 'bx bx-check-circle';
+            icon.style.color = 'var(--accent-success)';
+        }
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ─── Export ───
+    async function exportExcel() {
+        const found = results.filter(r => r.status === 'success');
+        if (found.length === 0) { showToast('Không có dữ liệu để xuất', 'warning'); return; }
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('KetQuaTraCuu');
+
+        sheet.columns = [
+            { header: 'SKU', key: 'sku', width: 22 },
+            { header: 'Tên SP', key: 'name', width: 45 },
+            { header: 'Nhóm', key: 'group', width: 15 },
+            { header: 'Phân loại', key: 'type', width: 15 },
+            { header: 'ĐVT', key: 'unit', width: 10 },
+            { header: 'Tồn kho', key: 'systemQty', width: 15 },
+            { header: 'Có sẵn', key: 'availableQty', width: 15 },
+            { header: 'Đang giữ', key: 'onHoldQty', width: 15 },
+            { header: 'Vị trí chính', key: 'mainLoc', width: 20 },
+            { header: 'Số kệ', key: 'shelfCount', width: 10 },
+            { header: 'Số Lot', key: 'lotCount', width: 10 }
+        ];
+
+        const headerRow = sheet.getRow(1);
+        headerRow.font = { name: 'Arial', family: 4, size: 12, bold: true, color: { argb: 'FFFFFFFF' } };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF6366F1' } };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+        found.forEach(r => {
+            const d = r.data;
+            sheet.addRow({
+                sku: r.sku,
+                name: d.name,
+                group: d.group || '',
+                type: d.isMedicine ? 'Thuốc' : 'Khác',
+                unit: d.unit,
+                systemQty: d.systemQty,
+                availableQty: d.availableQty,
+                onHoldQty: d.onHoldQty,
+                mainLoc: d.location || '',
+                shelfCount: d.locations.length,
+                lotCount: d.lots.length
+            });
+        });
+
+        sheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) {
+                row.font = { name: 'Arial', family: 4, size: 11 };
+                row.alignment = { vertical: 'middle', horizontal: 'left' };
+                row.getCell('systemQty').alignment = { horizontal: 'center' };
+                row.getCell('availableQty').alignment = { horizontal: 'center' };
+                row.getCell('onHoldQty').alignment = { horizontal: 'center' };
+                row.getCell('shelfCount').alignment = { horizontal: 'center' };
+                row.getCell('lotCount').alignment = { horizontal: 'center' };
+                row.getCell('unit').alignment = { horizontal: 'center' };
+                row.getCell('type').alignment = { horizontal: 'center' };
+                
+                if (rowNumber % 2 === 0) {
+                    row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+                }
+            }
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: {style:'thin', color: {argb:'FFE2E8F0'}},
+                    left: {style:'thin', color: {argb:'FFE2E8F0'}},
+                    bottom: {style:'thin', color: {argb:'FFE2E8F0'}},
+                    right: {style:'thin', color: {argb:'FFE2E8F0'}}
+                };
+            });
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, `Ket_qua_tra_cuu_${new Date().toISOString().slice(0,10)}.xlsx`);
+        showToast('Đã xuất Excel!');
+    }
+
+    function copyResults() {
+        const found = results.filter(r => r.status === 'success');
+        if (found.length === 0) { showToast('Không có dữ liệu để copy', 'warning'); return; }
+        const text = found.map(r => {
+            const d = r.data;
+            return `${r.sku}\t${d.name}\t${d.systemQty}\t${d.availableQty}\t${d.onHoldQty}\t${d.location || ''}\t${d.locations.length} vị trí\t${d.lots.length} lot`;
+        }).join('\n');
+        navigator.clipboard.writeText(text).then(() => showToast('Đã copy!'));
+    }
+
+    // ─── Event Listeners ───
+    document.addEventListener('DOMContentLoaded', () => {
+        try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
+        document.getElementById('btnSearch').addEventListener('click', doSearch);
+        document.getElementById('btnClearInput').addEventListener('click', () => {
+            document.getElementById('skuInput').value = '';
+            parsedSkus = [];
+            renderTags();
+            document.getElementById('resultsArea').style.display = 'none';
+            document.getElementById('statsArea').style.display = 'none';
+        });
+        document.getElementById('btnPaste').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('skuInput').value = text;
+                parsedSkus = parseSkus(text);
+                renderTags();
+                showToast('Đã dán ' + parsedSkus.length + ' SKU');
+            } catch (e) {
+                showToast('Không thể đọc clipboard', 'warning');
+            }
+        });
+        document.getElementById('btnExample').addEventListener('click', () => {
+            const examples = ['DSOQEM8DN9.ALER2AXH','DSOQEM8DN9.CELQ61PG','DSOQEM8DN9.PK7JYJYJ','SMEM8DN9F1.GE2ER2AX','Z3STYACBVI.NAK-TIF-05'];
+            document.getElementById('skuInput').value = examples.join('\n');
+            parsedSkus = parseSkus(examples.join('\n'));
+            renderTags();
+            showToast('Đã thêm ' + examples.length + ' SKU mẫu');
+        });
+        document.getElementById('skuInput').addEventListener('input', () => {
+            const text = document.getElementById('skuInput').value;
+            parsedSkus = parseSkus(text);
+            renderTags();
+        });
+        document.getElementById('btnExportResult').addEventListener('click', exportExcel);
+        document.getElementById('btnCopyResult').addEventListener('click', copyResults);
+    });
+
+    // ─── Keyboard shortcut ───
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            doSearch();
+        }
+    });
+
+    // ─── Page Navigator ───
+    function openPageNavigator() {
+        const modal = document.getElementById('pageNavModal');
+        const box = document.getElementById('pageNavBox');
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            box.style.transform = 'scale(1) translateY(0)';
+            box.style.opacity = '1';
+        });
+        document.addEventListener('keydown', _pnavEsc);
+        try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
+    }
+
+    function closePageNavigator() {
+        const modal = document.getElementById('pageNavModal');
+        const box = document.getElementById('pageNavBox');
+        if (!modal || !box) return;
+        box.style.transform = 'scale(0.9) translateY(20px)';
+        box.style.opacity = '0';
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+        document.removeEventListener('keydown', _pnavEsc);
+    }
+
+    function _pnavEsc(e) { if (e.key === 'Escape') closePageNavigator(); }
+
+    document.getElementById('pageNavModal').addEventListener('click', function(e) {
+        if (e.target === this) closePageNavigator();
+    });
+    </script>
+        </main>
+    </div>
+</body>
+</html>
