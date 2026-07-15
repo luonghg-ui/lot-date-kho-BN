@@ -320,7 +320,38 @@
         }
         @media (max-width: 600px) {
             .report-stats-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .stat-card-custom {
+                padding: 12px !important;
+                border-radius: 16px !important;
+            }
+            .stat-icon-box {
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 8px !important;
+                font-size: 15px !important;
+                margin-bottom: 8px !important;
+            }
+            .stat-icon-box i, .stat-icon-box svg {
+                width: 16px !important;
+                height: 16px !important;
+            }
+            .stat-title {
+                font-size: 9px !important;
+                margin-bottom: 4px !important;
+                letter-spacing: 0.05em !important;
+            }
+            .stat-value {
+                font-size: 16px !important;
+            }
+            .stat-desc {
+                font-size: 9px !important;
+                margin-top: 4px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
             }
         }
 
