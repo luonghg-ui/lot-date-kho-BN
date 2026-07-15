@@ -353,6 +353,45 @@
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
             }
+
+            /* Custom Daily Detail Modal Overrides for Mobile */
+            #dailyDetailModalBox {
+                width: 95% !important;
+                margin: 10px !important;
+            }
+            #dailyDetailModalBox .modal-header {
+                padding-right: 48px !important;
+            }
+            #dailyDetailModalBox .modal-header h3 {
+                font-size: 1.1rem !important;
+                flex-wrap: wrap !important;
+            }
+            #dailyDetailModalBox .modal-header h3 span {
+                font-size: 1.1rem !important;
+            }
+            #dailyDetailModalBox .table-responsive {
+                max-height: 60vh !important;
+            }
+            #dailyDetailModalBox table {
+                min-width: auto !important;
+                width: 100% !important;
+            }
+            #dailyDetailModalBox th, 
+            #dailyDetailModalBox td {
+                padding: 8px 6px !important;
+                font-size: 11px !important;
+            }
+            /* Hide SKU column on mobile to fit the screen */
+            #dailyDetailModalBox th:nth-child(1),
+            #dailyDetailModalBox td:nth-child(1) {
+                display: none !important;
+            }
+            /* Make product name column wrapping */
+            #dailyDetailModalBox td:nth-child(2) {
+                max-width: 120px !important;
+                white-space: normal !important;
+                word-break: break-word !important;
+            }
         }
 
         .stat-card-custom {
