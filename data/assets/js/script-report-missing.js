@@ -58,6 +58,18 @@ function init() {
     if (refreshBtn) {
         refreshBtn.addEventListener('click', fetchReportData);
     }
+    
+    // Close Daily Detail Modal
+    const overlay = document.getElementById('dailyDetailModalOverlay');
+    const closeBtn = document.getElementById('dailyDetailModalCloseBtn');
+    if (closeBtn && overlay) {
+        closeBtn.addEventListener('click', () => overlay.classList.remove('active'));
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
+            }
+        });
+    }
 }
 
 // Helpers
@@ -332,6 +344,16 @@ function updateCharts(dailyMap, shiftMap) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            onClick: (e, activeEls) => {
+                if (activeEls && activeEls.length > 0) {
+                    const firstEl = activeEls[0];
+                    const index = firstEl.index;
+                    const dateStr = dailyLabels[index];
+                    if (typeof showDailyDetailModal === 'function') {
+                        showDailyDetailModal(dateStr);
+                    }
+                }
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -416,6 +438,43 @@ function initChartsTheme() {
         processAggregations();
     }
 }
+
+window.showDailyDetailModal = function(dateStr) {
+    const overlay = document.getElementById('dailyDetailModalOverlay');
+    const title = document.getElementById('selectedDateTitle');
+    const summary = document.getElementById('selectedDateSummary');
+    const tbody = document.getElementById('dailyDetailTableBody');
+    if (!overlay || !tbody) return;
+
+    // Filter reportData
+    const items = reportData.filter(item => getDateFromTimestamp(item.timestamp) === dateStr);
+    
+    // Sort by qty desc
+    items.sort((a, b) => b.qty - a.qty);
+
+    title.textContent = dateStr;
+    
+    let totalQty = 0;
+    let totalAmt = 0;
+    
+    tbody.innerHTML = items.map(item => {
+        totalQty += item.qty;
+        totalAmt += item.amt;
+        return `
+            <tr style="border-bottom: 1px solid var(--white-alpha-5); transition: background 0.2s;">
+                <td style="padding: 12px 16px; font-family: monospace; font-size: 11px; color: #94a3b8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.sku}</td>
+                <td style="padding: 12px 16px; font-size: 13px; color: #e2e8f0; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">${item.name}</td>
+                <td style="padding: 12px 16px; font-size: 13px; color: #94a3b8; text-align: right;">${item.price > 0 ? formatCurrency(item.price) : 'Chưa rõ'}</td>
+                <td style="padding: 12px 16px; font-size: 13px; color: #f87171; text-align: right; font-weight: 700;">-${item.qty.toLocaleString('vi-VN')} SP</td>
+                <td style="padding: 12px 16px; font-size: 13px; color: #ff8a8a; text-align: right; font-weight: 700;">-${formatCurrency(item.amt)}</td>
+            </tr>
+        `;
+    }).join('');
+
+    summary.textContent = `Tổng cộng: ${items.length} SKU, Số lượng lệch: ${totalQty.toLocaleString('vi-VN')} SP, Tổng tiền chênh lệch: ${formatCurrency(totalAmt)}`;
+
+    overlay.classList.add('active');
+};
 
 // Run
 init();
