@@ -605,6 +605,46 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
+
+        /* Responsive Mobile Layout for Stats Cards */
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .stat-card-custom {
+                padding: 12px 10px !important;
+                border-radius: 16px !important;
+                gap: 8px !important;
+            }
+            .stat-card-custom::before {
+                border-radius: 16px !important;
+            }
+            .stat-card-icon-box {
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 8px !important;
+                font-size: 16px !important;
+            }
+            .stat-card-icon-box i, .stat-card-icon-box svg {
+                width: 16px !important;
+                height: 16px !important;
+            }
+            .stat-card-title {
+                font-size: 9px !important;
+                letter-spacing: 0.02em !important;
+            }
+            .stat-card-val {
+                font-size: 20px !important;
+            }
+            .stat-card-subtext {
+                font-size: 9px !important;
+            }
+            .stat-card-chart {
+                width: 90px !important;
+                height: 35px !important;
+            }
+        }
     </style>
 </head>
 
