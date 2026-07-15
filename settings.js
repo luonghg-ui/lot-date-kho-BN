@@ -2,6 +2,175 @@
 // Dùng chung cho tất cả các trang (index.html, mapping.html, ...)
 // Lưu trữ tập trung trong localStorage
 
+// ===== Cổng xác thực mật khẩu truy cập (Passcode Gate) =====
+(function() {
+    // Kiểm tra trạng thái đã đăng nhập hay chưa (lưu trong sessionStorage để thoát khi đóng tab)
+    const isAuthed = sessionStorage.getItem('wms_authenticated') === 'true';
+    if (!isAuthed) {
+        // Nhúng mã CSS cho màn hình đăng nhập
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .lock-screen-overlay {
+                position: fixed;
+                inset: 0;
+                background: #080c14;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 999999;
+                font-family: 'Inter', 'Outfit', sans-serif;
+            }
+            .lock-screen-card {
+                background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95));
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 24px;
+                padding: 40px 32px;
+                width: 90%;
+                max-width: 400px;
+                text-align: center;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+                animation: lockFadeIn 0.4s ease-out;
+                position: relative;
+            }
+            @keyframes lockFadeIn {
+                from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                to { opacity: 1; transform: scale(1) translateY(0); }
+            }
+            .lock-icon-container {
+                width: 64px;
+                height: 64px;
+                border-radius: 20px;
+                background: rgba(99, 102, 241, 0.15);
+                color: #6366f1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 32px;
+                margin: 0 auto 24px auto;
+                box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+            }
+            .lock-screen-title {
+                font-size: 20px;
+                font-weight: 800;
+                color: #fff;
+                margin-bottom: 8px;
+                font-family: 'Outfit', sans-serif;
+            }
+            .lock-screen-subtitle {
+                font-size: 13px;
+                color: #94a3b8;
+                margin-bottom: 32px;
+            }
+            .lock-input-group {
+                position: relative;
+                margin-bottom: 20px;
+            }
+            .lock-input {
+                width: 100%;
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 12px;
+                padding: 14px 16px 14px 44px;
+                color: #fff;
+                font-size: 15px;
+                outline: none;
+                box-sizing: border-box;
+                transition: all 0.3s;
+                text-align: center;
+                letter-spacing: 0.1em;
+            }
+            .lock-input:focus {
+                border-color: #6366f1;
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            }
+            .lock-input-icon {
+                position: absolute;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #64748b;
+                font-size: 18px;
+            }
+            .lock-btn {
+                width: 100%;
+                background: linear-gradient(135deg, #a855f7, #6366f1);
+                color: #fff;
+                border: none;
+                border-radius: 12px;
+                padding: 14px;
+                font-size: 15px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s;
+                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            }
+            .lock-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
+            }
+            .lock-error {
+                color: #f87171;
+                font-size: 13px;
+                margin-top: 12px;
+                display: none;
+                font-weight: 600;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Chèn mã HTML màn hình khóa
+        const injectLockScreen = () => {
+            if (document.getElementById('lockScreenOverlay')) return;
+            const overlay = document.createElement('div');
+            overlay.id = 'lockScreenOverlay';
+            overlay.className = 'lock-screen-overlay';
+            overlay.innerHTML = `
+                <div class="lock-screen-card">
+                    <div class="lock-icon-container">
+                        <i class='bx bxs-lock-alt'></i>
+                    </div>
+                    <div class="lock-screen-title">Hệ Thống WMS Kho BN</div>
+                    <div class="lock-screen-subtitle">Vui lòng nhập mật khẩu truy cập</div>
+                    <form id="lockScreenForm" onsubmit="event.preventDefault(); return false;">
+                        <div class="lock-input-group">
+                            <i class='bx bxs-key lock-input-icon'></i>
+                            <input type="password" id="lockInput" class="lock-input" placeholder="Mật khẩu của bạn" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="lock-btn">Đăng nhập</button>
+                        <div class="lock-error" id="lockErrorMsg">Mật khẩu không chính xác!</div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            // Xử lý sự kiện đăng nhập
+            const form = document.getElementById('lockScreenForm');
+            const input = document.getElementById('lockInput');
+            const error = document.getElementById('lockErrorMsg');
+            
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Mật khẩu mặc định là: 123456
+                if (input.value === '123456') {
+                    sessionStorage.setItem('wms_authenticated', 'true');
+                    overlay.remove();
+                } else {
+                    error.style.display = 'block';
+                    input.style.borderColor = '#f87171';
+                    input.value = '';
+                    input.focus();
+                }
+            });
+        };
+
+        if (document.body) {
+            injectLockScreen();
+        } else {
+            document.addEventListener('DOMContentLoaded', injectLockScreen);
+        }
+    }
+})();
+
 // ===== Danh sách trang hệ thống =====
 const PAGES = [
     { id: 'mapping',   label: 'Mapping Kệ Nhanh',   url: '../mapping.html', icon: 'map-pin', color: 'emerald', desc: 'Tra cứu vị trí kệ theo SKU' },
