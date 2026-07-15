@@ -1756,6 +1756,9 @@ td.text-act { color: #38BDF8; font-weight: 700; font-size: 1.1rem; }
         flex-direction: column !important;
         min-height: 100vh !important;
         padding-bottom: 76px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
     }
     .sidebar {
         position: fixed !important;
