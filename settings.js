@@ -219,9 +219,7 @@
     }
 })();
 
-// ===== Danh sách trang hệ thống =====
 const PAGES = [
-    { id: 'home',      label: 'Trang Chủ Hệ Thống', url: '../index.html', icon: 'home', color: 'indigo', desc: 'Quay về trang trung tâm quản trị WMS Helper' },
     { id: 'mapping',   label: 'Mapping Kệ Nhanh',   url: '../mapping.html', icon: 'map-pin', color: 'emerald', desc: 'Tra cứu vị trí kệ theo SKU' },
     { id: 'candate',   label: 'Sản Phẩm Cận Date', url: '../data/html/candate.html', icon: 'calendar', color: 'indigo', desc: 'Lọc sản phẩm HSD dưới 1 năm' },
     { id: 'missing',   label: 'Data Missing – Tính Lệch', url: '../data/html/data-missing.html', icon: 'radar', color: 'indigo', desc: 'Khớp dữ liệu kiểm kê vs hệ thống' },
