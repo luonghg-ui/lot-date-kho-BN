@@ -4,9 +4,53 @@
 
 // ===== Cổng xác thực mật khẩu truy cập (Passcode Gate) =====
 (function() {
-    // Kiểm tra trạng thái đã đăng nhập hay chưa (lưu trong sessionStorage để thoát khi đóng tab)
-    const isAuthed = sessionStorage.getItem('wms_authenticated') === 'true';
+    const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 phút = 300.000 ms
+
+    // Kiểm tra tính hợp lệ thời gian hoạt động cuối cùng
+    const checkInactivity = () => {
+        const lastActivity = sessionStorage.getItem('wms_last_activity');
+        if (lastActivity) {
+            const timePassed = Date.now() - parseInt(lastActivity, 10);
+            if (timePassed > INACTIVITY_LIMIT) {
+                sessionStorage.removeItem('wms_authenticated');
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const isValidSession = checkInactivity();
+    const isAuthed = sessionStorage.getItem('wms_authenticated') === 'true' && isValidSession;
+
+    function startActivityTracking() {
+        sessionStorage.setItem('wms_last_activity', Date.now());
+
+        // Lắng nghe các sự kiện để reset thời gian hoạt động cuối
+        const updateActivity = () => {
+            if (sessionStorage.getItem('wms_authenticated') === 'true') {
+                sessionStorage.setItem('wms_last_activity', Date.now());
+            }
+        };
+
+        const events = ['mousemove', 'mousedown', 'keypress', 'touchstart', 'scroll'];
+        events.forEach(name => {
+            document.addEventListener(name, updateActivity, { passive: true });
+        });
+
+        // Chạy ngầm kiểm tra hoạt động mỗi 5 giây
+        setInterval(() => {
+            if (sessionStorage.getItem('wms_authenticated') === 'true') {
+                const lastActivity = sessionStorage.getItem('wms_last_activity');
+                if (lastActivity && (Date.now() - parseInt(lastActivity, 10) > INACTIVITY_LIMIT)) {
+                    sessionStorage.removeItem('wms_authenticated');
+                    window.location.reload();
+                }
+            }
+        }, 5000);
+    }
+
     if (!isAuthed) {
+        sessionStorage.removeItem('wms_authenticated');
         // Nhúng mã CSS cho màn hình đăng nhập
         const style = document.createElement('style');
         style.innerHTML = `
@@ -153,7 +197,9 @@
                 // Mật khẩu mặc định là: 123456
                 if (input.value === '123456') {
                     sessionStorage.setItem('wms_authenticated', 'true');
+                    sessionStorage.setItem('wms_last_activity', Date.now());
                     overlay.remove();
+                    startActivityTracking();
                 } else {
                     error.style.display = 'block';
                     input.style.borderColor = '#f87171';
@@ -168,6 +214,8 @@
         } else {
             document.addEventListener('DOMContentLoaded', injectLockScreen);
         }
+    } else {
+        startActivityTracking();
     }
 })();
 
