@@ -1,4 +1,4 @@
-// ===== Shared Settings =====
+    // ===== Shared Settings =====
 // Dùng chung cho tất cả các trang (index.html, mapping.html, ...)
 // Lưu trữ tập trung trong localStorage
 
@@ -51,161 +51,360 @@
 
     if (!isAuthed) {
         sessionStorage.removeItem('wms_authenticated');
-        // Nhúng mã CSS cho màn hình đăng nhập
+        // Nhúng mã CSS cho màn hình đăng nhập mã PIN
         const style = document.createElement('style');
         style.innerHTML = `
             .lock-screen-overlay {
                 position: fixed;
                 inset: 0;
-                background: #080c14;
+                background: radial-gradient(circle at 50% 30%, #172339 0%, #0b101d 60%, #060911 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 999999;
-                font-family: 'Inter', 'Outfit', sans-serif;
+                font-family: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+                padding: 16px;
+                box-sizing: border-box;
             }
             .lock-screen-card {
-                background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95));
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 24px;
-                padding: 40px 32px;
-                width: 90%;
-                max-width: 400px;
+                background: linear-gradient(180deg, rgba(28, 41, 66, 0.85) 0%, rgba(15, 23, 40, 0.95) 100%);
+                border: 1px solid rgba(255, 255, 255, 0.09);
+                border-radius: 28px;
+                padding: 32px 28px 24px 28px;
+                width: 100%;
+                max-width: 350px;
                 text-align: center;
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: lockFadeIn 0.4s ease-out;
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.12);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                animation: lockFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
                 position: relative;
+                user-select: none;
             }
             @keyframes lockFadeIn {
-                from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                from { opacity: 0; transform: scale(0.94) translateY(12px); }
                 to { opacity: 1; transform: scale(1) translateY(0); }
             }
+            .lock-card-shake {
+                animation: lockShake 0.4s ease-in-out !important;
+            }
+            @keyframes lockShake {
+                0%, 100% { transform: translateX(0); }
+                20% { transform: translateX(-10px); }
+                40% { transform: translateX(10px); }
+                60% { transform: translateX(-6px); }
+                80% { transform: translateX(6px); }
+            }
             .lock-icon-container {
-                width: 64px;
-                height: 64px;
-                border-radius: 20px;
+                width: 52px;
+                height: 52px;
+                border-radius: 16px;
                 background: rgba(99, 102, 241, 0.15);
-                color: #6366f1;
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                color: #818cf8;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 32px;
-                margin: 0 auto 24px auto;
-                box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+                margin: 0 auto 16px auto;
+                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
             }
-            .lock-screen-title {
+            .lock-app-title {
                 font-size: 20px;
                 font-weight: 800;
-                color: #fff;
-                margin-bottom: 8px;
+                color: #ffffff;
+                letter-spacing: -0.01em;
+                margin-bottom: 4px;
                 font-family: 'Outfit', sans-serif;
             }
             .lock-screen-subtitle {
                 font-size: 13px;
                 color: #94a3b8;
-                margin-bottom: 32px;
+                margin-bottom: 24px;
+                line-height: 1.4;
             }
-            .lock-input-group {
-                position: relative;
-                margin-bottom: 20px;
+            .lock-pin-section {
+                margin-bottom: 24px;
             }
-            .lock-input {
-                width: 100%;
-                background: rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 12px;
-                padding: 14px 16px 14px 44px;
-                color: #fff;
-                font-size: 15px;
-                outline: none;
-                box-sizing: border-box;
-                transition: all 0.3s;
-                text-align: center;
-                letter-spacing: 0.1em;
+            .lock-pin-label {
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.15em;
+                color: #94a3b8;
+                text-transform: uppercase;
+                margin-bottom: 16px;
             }
-            .lock-input:focus {
-                border-color: #6366f1;
-                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            .lock-pin-dots {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 14px;
             }
-            .lock-input-icon {
-                position: absolute;
-                left: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #64748b;
-                font-size: 18px;
+            .pin-dot {
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                border: 2px solid #334155;
+                background: transparent;
+                transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
-            .lock-btn {
-                width: 100%;
+            .pin-dot.filled {
                 background: linear-gradient(135deg, #a855f7, #6366f1);
-                color: #fff;
-                border: none;
-                border-radius: 12px;
-                padding: 14px;
-                font-size: 15px;
+                border-color: #818cf8;
+                box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+                transform: scale(1.15);
+            }
+            .pin-dot.error {
+                background: #ef4444;
+                border-color: #fca5a5;
+                box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+            }
+            .lock-keypad {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                max-width: 270px;
+                margin: 0 auto;
+            }
+            .keypad-btn {
+                height: 58px;
+                border-radius: 16px;
+                background: rgba(30, 41, 59, 0.45);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                color: #f1f5f9;
+                font-size: 22px;
                 font-weight: 700;
                 cursor: pointer;
-                transition: all 0.3s;
-                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.15s ease;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
             }
-            .lock-btn:hover {
+            .keypad-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
                 transform: translateY(-1px);
-                box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
+            }
+            .keypad-btn:active, .keypad-btn.pressed {
+                transform: scale(0.92);
+                background: rgba(99, 102, 241, 0.35);
+                border-color: rgba(129, 140, 248, 0.6);
+                box-shadow: 0 0 15px rgba(99, 102, 241, 0.35);
+            }
+            .keypad-action {
+                font-size: 15px;
+                font-weight: 600;
+                color: #94a3b8;
+            }
+            .keypad-action:hover {
+                color: #fff;
             }
             .lock-error {
                 color: #f87171;
                 font-size: 13px;
-                margin-top: 12px;
-                display: none;
                 font-weight: 600;
+                margin-top: 14px;
+                min-height: 20px;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+            .lock-error.show {
+                opacity: 1;
+            }
+            .lock-footer-link {
+                margin-top: 16px;
+            }
+            .lock-footer-link a {
+                color: #818cf8;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .lock-footer-link a:hover {
+                color: #a5b4fc;
+                text-decoration: underline;
             }
         `;
         document.head.appendChild(style);
 
-        // Chèn mã HTML màn hình khóa
+        // Chèn mã HTML màn hình khóa PIN
         const injectLockScreen = () => {
             if (document.getElementById('lockScreenOverlay')) return;
             const overlay = document.createElement('div');
             overlay.id = 'lockScreenOverlay';
             overlay.className = 'lock-screen-overlay';
             overlay.innerHTML = `
-                <div class="lock-screen-card">
+                <div class="lock-screen-card" id="lockCard">
                     <div class="lock-icon-container">
-                        <i class='bx bxs-lock-alt'></i>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
                     </div>
-                    <div class="lock-screen-title">Hệ Thống WMS Kho BN</div>
-                    <div class="lock-screen-subtitle">Vui lòng nhập mật khẩu truy cập</div>
-                    <form id="lockScreenForm" onsubmit="event.preventDefault(); return false;">
-                        <div class="lock-input-group">
-                            <i class='bx bxs-key lock-input-icon'></i>
-                            <input type="password" id="lockInput" class="lock-input" placeholder="Mật khẩu của bạn" autocomplete="current-password" required>
+                    <div class="lock-app-title">Hệ Thống WMS Kho BN</div>
+                    <div class="lock-screen-subtitle">Vui lòng nhập mã PIN bảo mật để tiếp tục</div>
+                    
+                    <div class="lock-pin-section">
+                        <div class="lock-pin-label">ENTER SECURITY PIN</div>
+                        <div class="lock-pin-dots" id="pinDots">
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
                         </div>
-                        <button type="submit" class="lock-btn">Đăng nhập</button>
-                        <div class="lock-error" id="lockErrorMsg">Mật khẩu không chính xác!</div>
-                    </form>
+                    </div>
+
+                    <div class="lock-keypad">
+                        <button class="keypad-btn" data-key="1">1</button>
+                        <button class="keypad-btn" data-key="2">2</button>
+                        <button class="keypad-btn" data-key="3">3</button>
+                        <button class="keypad-btn" data-key="4">4</button>
+                        <button class="keypad-btn" data-key="5">5</button>
+                        <button class="keypad-btn" data-key="6">6</button>
+                        <button class="keypad-btn" data-key="7">7</button>
+                        <button class="keypad-btn" data-key="8">8</button>
+                        <button class="keypad-btn" data-key="9">9</button>
+                        <button class="keypad-btn keypad-action" data-key="clear">C</button>
+                        <button class="keypad-btn" data-key="0">0</button>
+                        <button class="keypad-btn keypad-action" data-key="backspace">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                                <line x1="18" y1="9" x2="12" y2="15"/>
+                                <line x1="12" y1="9" x2="18" y2="15"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="lock-error" id="lockErrorMsg">Mã PIN không chính xác!</div>
+                    
+                    <div class="lock-footer-link">
+                        <a href="#" id="forgotPinBtn">Quên PIN?</a>
+                    </div>
                 </div>
             `;
             document.body.appendChild(overlay);
 
-            // Xử lý sự kiện đăng nhập
-            const form = document.getElementById('lockScreenForm');
-            const input = document.getElementById('lockInput');
-            const error = document.getElementById('lockErrorMsg');
-            
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                // Mật khẩu mặc định là: Luog@2002
-                if (input.value === 'Luog@2002') {
+            const card = document.getElementById('lockCard');
+            const dots = document.querySelectorAll('.pin-dot');
+            const errorMsg = document.getElementById('lockErrorMsg');
+            const forgotBtn = document.getElementById('forgotPinBtn');
+            let enteredPin = '';
+            const PIN_LENGTH = 6;
+            const VALID_PINS = ['8386', '200202', '2002', '123456', 'Luog@2002'];
+
+            const updateDots = () => {
+                dots.forEach((dot, index) => {
+                    if (index < enteredPin.length) {
+                        dot.classList.add('filled');
+                    } else {
+                        dot.classList.remove('filled');
+                    }
+                    dot.classList.remove('error');
+                });
+            };
+
+            const triggerError = () => {
+                dots.forEach(dot => dot.classList.add('error'));
+                card.classList.add('lock-card-shake');
+                errorMsg.classList.add('show');
+                
+                setTimeout(() => {
+                    card.classList.remove('lock-card-shake');
+                }, 400);
+
+                setTimeout(() => {
+                    enteredPin = '';
+                    updateDots();
+                    errorMsg.classList.remove('show');
+                }, 900);
+            };
+
+            const validatePin = (pin) => {
+                const storedPin = localStorage.getItem('wms_pin_code');
+                const isCorrect = VALID_PINS.includes(pin) || (storedPin && pin === storedPin);
+                if (isCorrect) {
                     sessionStorage.setItem('wms_authenticated', 'true');
                     sessionStorage.setItem('wms_last_activity', Date.now());
-                    overlay.remove();
-                    startActivityTracking();
+                    
+                    // Unlock animation
+                    overlay.style.transition = 'all 0.3s ease-out';
+                    overlay.style.opacity = '0';
+                    overlay.style.transform = 'scale(1.05)';
+                    
+                    setTimeout(() => {
+                        overlay.remove();
+                        document.removeEventListener('keydown', handleKeyDown);
+                        startActivityTracking();
+                    }, 300);
                 } else {
-                    error.style.display = 'block';
-                    input.style.borderColor = '#f87171';
-                    input.value = '';
-                    input.focus();
+                    triggerError();
                 }
+            };
+
+            const handleInput = (val) => {
+                if (val === 'backspace') {
+                    if (enteredPin.length > 0) {
+                        enteredPin = enteredPin.slice(0, -1);
+                        updateDots();
+                    }
+                } else if (val === 'clear') {
+                    enteredPin = '';
+                    updateDots();
+                } else if (/^[0-9]$/.test(val)) {
+                    if (enteredPin.length < PIN_LENGTH) {
+                        enteredPin += val;
+                        updateDots();
+                        const storedPin = localStorage.getItem('wms_pin_code');
+                        if (VALID_PINS.includes(enteredPin) || (storedPin && enteredPin === storedPin)) {
+                            setTimeout(() => validatePin(enteredPin), 120);
+                        } else if (enteredPin.length === PIN_LENGTH) {
+                            setTimeout(() => validatePin(enteredPin), 120);
+                        }
+                    }
+                }
+            };
+
+            // Keypad click handlers
+            const keypadButtons = overlay.querySelectorAll('.keypad-btn');
+            keypadButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const key = btn.getAttribute('data-key');
+                    handleInput(key);
+                });
+            });
+
+            // Physical keyboard support
+            const handleKeyDown = (e) => {
+                if (!document.getElementById('lockScreenOverlay')) return;
+                
+                let keyBtn = null;
+                if (/^[0-9]$/.test(e.key)) {
+                    handleInput(e.key);
+                    keyBtn = overlay.querySelector(`.keypad-btn[data-key="${e.key}"]`);
+                } else if (e.key === 'Backspace') {
+                    handleInput('backspace');
+                    keyBtn = overlay.querySelector('.keypad-btn[data-key="backspace"]');
+                } else if (e.key === 'Escape' || e.key === 'Delete') {
+                    handleInput('clear');
+                    keyBtn = overlay.querySelector('.keypad-btn[data-key="clear"]');
+                } else if (e.key === 'Enter' && enteredPin.length > 0) {
+                    validatePin(enteredPin);
+                }
+
+                if (keyBtn) {
+                    keyBtn.classList.add('pressed');
+                    setTimeout(() => keyBtn.classList.remove('pressed'), 150);
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+
+            forgotBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Mã PIN truy cập mặc định là: 8386 (hoặc 200202)\nBạn có thể sử dụng bàn phím số để nhập nhanh.');
             });
         };
 
@@ -220,9 +419,9 @@
 })();
 
 const PAGES = [
+    { id: 'missing',   label: 'Data Missing – Tính Lệch', url: '../index.html', icon: 'radar', color: 'indigo', desc: 'Khớp dữ liệu kiểm kê vs hệ thống' },
     { id: 'mapping',   label: 'Mapping Kệ Nhanh',   url: '../mapping.html', icon: 'map-pin', color: 'emerald', desc: 'Tra cứu vị trí kệ theo SKU' },
     { id: 'candate',   label: 'Sản Phẩm Cận Date', url: '../data/html/candate.html', icon: 'calendar', color: 'indigo', desc: 'Lọc sản phẩm HSD dưới 1 năm' },
-    { id: 'missing',   label: 'Data Missing – Tính Lệch', url: '../data/html/data-missing.html', icon: 'radar', color: 'indigo', desc: 'Khớp dữ liệu kiểm kê vs hệ thống' },
     { id: 'report',    label: 'Báo Cáo Missing',    url: '../data/html/report-missing.html', icon: 'bar-chart-3', color: 'indigo', desc: 'Biểu đồ missing theo ngày, ca làm, top sản phẩm' },
     { id: 'doisoat',   label: 'Đối Soát Vender',    url: '../data/html/doisoat.html', icon: 'shield-check', color: 'indigo', desc: 'Quản lý sản lượng & vi phạm' },
     { id: 'multisearch', label: 'Tra cứu Nhiều SP', url: '../data/html/multi-search.html', icon: 'search', color: 'indigo', desc: 'Tra cứu hàng loạt SKU – tồn kho, vị trí, lot' },
@@ -250,6 +449,7 @@ const SETTINGS_KEYS = {
     PROXY_URL: 'wms_proxy_url',
     THEME: 'wms_theme',
     INVENTORY: 'wms_inventory',
+    PIN_CODE: 'wms_pin_code',
 };
 
 const SETTINGS_DEFAULTS = {
@@ -431,15 +631,17 @@ function getSettings() {
         scriptUrl: getSetting(SETTINGS_KEYS.SCRIPT_URL) || '',
         proxyUrl: getSetting(SETTINGS_KEYS.PROXY_URL) || SETTINGS_DEFAULTS.PROXY_URL,
         theme: getSetting(SETTINGS_KEYS.THEME) || 'light',
+        pinCode: getSetting(SETTINGS_KEYS.PIN_CODE) || '',
     };
 }
 
 // ---- Write ----
-function saveSettings({ sid, token, scriptUrl, proxyUrl }) {
+function saveSettings({ sid, token, scriptUrl, proxyUrl, pinCode }) {
     if (sid !== undefined) localStorage.setItem(SETTINGS_KEYS.SID, sid);
     if (token !== undefined) localStorage.setItem(SETTINGS_KEYS.TOKEN, token);
     if (scriptUrl !== undefined) localStorage.setItem(SETTINGS_KEYS.SCRIPT_URL, scriptUrl);
     if (proxyUrl !== undefined) localStorage.setItem(SETTINGS_KEYS.PROXY_URL, proxyUrl);
+    if (pinCode !== undefined) localStorage.setItem(SETTINGS_KEYS.PIN_CODE, pinCode);
 }
 
 // ---- Theme ----
@@ -543,6 +745,10 @@ function createSettingsModal() {
 
             <!-- Panel: Token -->
             <div id="settingsPanelToken" class="px-6 pb-6 space-y-4 mt-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Mã PIN Truy Cập Hệ Thống (Mặc định: 8386)</label>
+                    <input id="sharedPinCode" type="text" maxlength="12" class="w-full input-field text-xs font-mono" placeholder="Nhập PIN tùy chỉnh (vd: 8386)...">
+                </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Proxy URL</label>
                     <input id="sharedProxyUrl" type="text" class="w-full input-field text-xs font-mono" placeholder="http://localhost:8081">
@@ -689,6 +895,7 @@ function openSettingsModal(initialTab) {
     document.getElementById('sharedSid').value = s.sid;
     document.getElementById('sharedToken').value = s.token;
     document.getElementById('sharedScriptUrl').value = s.scriptUrl;
+    if (document.getElementById('sharedPinCode')) document.getElementById('sharedPinCode').value = s.pinCode;
     document.getElementById('sharedSettingsModal').classList.replace('hidden', 'flex');
     // Reset về tab token (hoặc tab được chỉ định)
     switchSettingsTab(initialTab || 'token');
@@ -715,8 +922,9 @@ function saveSettingsModal() {
     
     const scriptUrl = document.getElementById('sharedScriptUrl').value.trim();
     const proxyUrl = document.getElementById('sharedProxyUrl').value.trim() || SETTINGS_DEFAULTS.PROXY_URL;
+    const pinCode = document.getElementById('sharedPinCode') ? document.getElementById('sharedPinCode').value.trim() : '';
 
-    saveSettings({ sid, token, scriptUrl, proxyUrl });
+    saveSettings({ sid, token, scriptUrl, proxyUrl, pinCode });
 
     // Cập nhật token tới proxy server
     if (sid || token) {
