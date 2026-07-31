@@ -194,8 +194,8 @@
             
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                // Mật khẩu mặc định là: 123456
-                if (input.value === '123456') {
+                // Mật khẩu mặc định là: Luog@2002
+                if (input.value === 'Luog@2002') {
                     sessionStorage.setItem('wms_authenticated', 'true');
                     sessionStorage.setItem('wms_last_activity', Date.now());
                     overlay.remove();
