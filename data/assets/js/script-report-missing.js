@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // WMS REPORT MISSING CONTROLLER
 // ============================================================
 
@@ -150,7 +150,8 @@ function parseGVizData(json) {
             qty: headers.indexOf('.qty_moving'),
             amt: headers.indexOf('.amt_moving'),
             date: headers.indexOf('ngày'),
-            price: headers.indexOf('price_unit')
+            price: headers.indexOf('price_unit'),
+            locationFrom: headers.indexOf('location_from')
         };
         
         // Fallbacks if header mapping fails
@@ -160,6 +161,7 @@ function parseGVizData(json) {
         if (idx.amt === -1) idx.amt = 18;
         if (idx.date === -1) idx.date = 20;
         if (idx.price === -1) idx.price = 16;
+        if (idx.locationFrom === -1) idx.locationFrom = 10; // fallback col index
 
         const getSafeStr = (cell) => {
             if (!cell || cell.v === null || cell.v === undefined) return '';
@@ -180,7 +182,8 @@ function parseGVizData(json) {
                 qty: Math.abs(getSafeNum(r.c[idx.qty])), // make it absolute for stats
                 amt: Math.abs(getSafeNum(r.c[idx.amt])),
                 timestamp: getSafeStr(r.c[idx.date]),
-                price: getSafeNum(r.c[idx.price])
+                price: getSafeNum(r.c[idx.price]),
+                locationFrom: getSafeStr(r.c[idx.locationFrom])
             };
         }).filter(item => item && item.sku);
 
@@ -262,6 +265,9 @@ function processAggregations() {
 
     // 3. Render Top Products List
     renderTopProducts(productMap);
+
+    // 4b. Render Kệ Pa / Kệ Xám tables
+    renderShelfTables(reportData);
 
     // 4. Update Charts
     updateCharts(dailyMap, shiftMap);
@@ -475,6 +481,55 @@ window.showDailyDetailModal = function(dateStr) {
 
     overlay.classList.add('active');
 };
+
+// ============================================================
+// RENDER KE PA & KE XAM TABLES
+// ============================================================
+function renderShelfTables(data) {
+    var paSku = {};
+    var xamSku = {};
+
+    data.forEach(function(item) {
+        var loc = (item.locationFrom || '').toUpperCase();
+        var isPa = loc.indexOf('PA') >= 0;
+        var map = isPa ? paSku : xamSku;
+        if (!map[item.sku]) {
+            map[item.sku] = { sku: item.sku, name: item.name, qty: 0, locationFrom: item.locationFrom };
+        }
+        map[item.sku].qty += item.qty;
+    });
+
+    renderOneShelfTable('shelfPaTableBody', paSku);
+    renderOneShelfTable('shelfXamTableBody', xamSku);
+}
+
+
+function renderOneShelfTable(tbodyId, skuMap) {
+    var tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+
+    var sorted = Object.values(skuMap).sort(function(a, b) { return b.qty - a.qty; });
+
+    if (sorted.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#64748b;font-size:13px;">Chua co du lieu</td></tr>';
+        return;
+    }
+
+    var html = '';
+    sorted.forEach(function(item) {
+        var sku = item.sku || '';
+        var name = (item.name || '').replace(/"/g, '&quot;');
+        var loc = item.locationFrom || '-';
+        var qty = item.qty.toLocaleString('vi-VN');
+        html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">';
+        html += '<td style="padding:9px 10px;font-family:monospace;font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + sku + '">' + sku + '</td>';
+        html += '<td style="padding:9px 10px;font-size:11px;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + name + '">' + name + '</td>';
+        html += '<td style="padding:9px 8px;font-size:12px;color:#f87171;font-weight:700;text-align:right;white-space:nowrap;">' + qty + '</td>';
+        html += '<td style="padding:9px 10px;font-size:11px;color:#818cf8;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + loc + '">' + loc + '</td>';
+        html += '</tr>';
+    });
+    tbody.innerHTML = html;
+}
 
 // Run
 init();

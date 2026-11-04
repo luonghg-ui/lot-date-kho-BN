@@ -197,6 +197,7 @@
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
+            .shelf-grid { grid-template-columns: 1fr !important; }
         }
         
         .chart-card {
@@ -567,16 +568,74 @@
                 </div>
             </div>
 
-            <!-- Top Missing Products List & Table -->
-            <div class="chart-card" style="min-height: auto;">
-                <div class="chart-header">
-                    <span class="chart-title"><i class='bx bxs-hot'></i> Top 10 sản phẩm có lượng missing nhiều nhất</span>
-                    <span style="font-size: 11px; color: #64748b;">Xếp hạng chênh lệch âm</span>
+            <!-- Hidden topProductsList for JS compatibility -->
+            <div id="topProductsList" style="display:none;"></div>
+
+            <!-- Kệ Pa & Kệ Xám Tables -->
+            <div class="shelf-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+                <!-- Kệ Pa -->
+                <div class="chart-card" style="min-height: auto; padding: 0; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(99,102,241,0.08)); padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:10px;">
+                        <div style="width:32px;height:32px;border-radius:10px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;">
+                            <i class='bx bx-cabinet' style="color:#818cf8;font-size:16px;"></i>
+                        </div>
+                        <span style="font-size:15px;font-weight:700;color:#fff;font-family:'Outfit',sans-serif;">Kệ Pa</span>
+                    </div>
+                    <div style="max-height: 420px; overflow-y:auto;">
+                        <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+                            <colgroup>
+                                <col style="width:22%">
+                                <col style="width:42%">
+                                <col style="width:18%">
+                                <col style="width:18%">
+                            </colgroup>
+                            <thead>
+                                <tr style="position:sticky;top:0;background:#1a2235;z-index:1;border-bottom:1px solid rgba(255,255,255,0.08);">
+                                    <th style="padding:10px 10px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Mã SKU</th>
+                                    <th style="padding:10px 10px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Tên sản phẩm</th>
+                                    <th style="padding:10px 8px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;text-align:right;white-space:nowrap;">SL</th>
+                                    <th style="padding:10px 10px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Kệ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shelfPaTableBody">
+                                <tr><td colspan="4" style="text-align:center;padding:24px;color:#64748b;font-size:13px;">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="top-list" id="topProductsList">
-                    <!-- Loading skeleton -->
-                    <div style="text-align: center; padding: 40px; color: var(--text-dim);">Đang tải dữ liệu báo cáo...</div>
+
+                <!-- Kệ Xám -->
+                <div class="chart-card" style="min-height: auto; padding: 0; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, rgba(100,116,139,0.25), rgba(100,116,139,0.08)); padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:10px;">
+                        <div style="width:32px;height:32px;border-radius:10px;background:rgba(100,116,139,0.2);border:1px solid rgba(100,116,139,0.4);display:flex;align-items:center;justify-content:center;">
+                            <i class='bx bx-cabinet' style="color:#94a3b8;font-size:16px;"></i>
+                        </div>
+                        <span style="font-size:15px;font-weight:700;color:#fff;font-family:'Outfit',sans-serif;">Kệ Xám</span>
+                    </div>
+                    <div style="max-height: 420px; overflow-y:auto;">
+                        <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+                            <colgroup>
+                                <col style="width:22%">
+                                <col style="width:42%">
+                                <col style="width:18%">
+                                <col style="width:18%">
+                            </colgroup>
+                            <thead>
+                                <tr style="position:sticky;top:0;background:#1a2235;z-index:1;border-bottom:1px solid rgba(255,255,255,0.08);">
+                                    <th style="padding:10px 10px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Mã SKU</th>
+                                    <th style="padding:10px 10px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Tên sản phẩm</th>
+                                    <th style="padding:10px 8px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;text-align:right;white-space:nowrap;">SL</th>
+                                    <th style="padding:10px 10px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Kệ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shelfXamTableBody">
+                                <tr><td colspan="4" style="text-align:center;padding:24px;color:#64748b;font-size:13px;">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
             </div>
         </main>
     </div>
