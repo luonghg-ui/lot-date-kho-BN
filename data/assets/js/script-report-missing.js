@@ -32,11 +32,6 @@ window.setChartMode = function(mode) {
     if (btnQty && btnAmt) {
         btnQty.classList.toggle('active', mode === 'qty');
         btnAmt.classList.toggle('active', mode === 'amt');
-        // legacy inline style fallback
-        btnQty.style.background = mode === 'qty' ? '#6366f1' : 'transparent';
-        btnQty.style.color = mode === 'qty' ? '#fff' : '#94a3b8';
-        btnAmt.style.background = mode === 'amt' ? '#6366f1' : 'transparent';
-        btnAmt.style.color = mode === 'amt' ? '#fff' : '#94a3b8';
     }
     processAggregations();
 };
@@ -76,7 +71,6 @@ function getProxyUrl() {
 function getShiftFromTime(timeStr) {
     if (!timeStr) return 'Khác';
     
-    // matches e.g. "14/07/2026 4:47:00 AM" or "13/07/2026 11:58:11 PM"
     const timeMatch = timeStr.match(/(\d+):(\d+):(\d+)\s*(AM|PM)/i);
     if (!timeMatch) return 'Khác';
     
@@ -87,9 +81,6 @@ function getShiftFromTime(timeStr) {
     if (ampm === 'PM' && hour !== 12) hour += 12;
     if (ampm === 'AM' && hour === 12) hour = 0;
     
-    // Ca 1: 06:00:00 - 13:59:59 (360 - 839 minutes)
-    // Ca 2: 14:00:00 - 21:59:59 (840 - 1319 minutes)
-    // Ca 3: 22:00:00 - 05:59:59 (1320 - 359 minutes)
     const totalMinutes = hour * 60 + minute;
     if (totalMinutes >= 360 && totalMinutes < 840) {
         return 'Ca 1';
@@ -114,7 +105,6 @@ function formatCurrency(val) {
 function fetchReportData() {
     if (statusBanner) statusBanner.style.display = 'block';
     
-    // Clear old script tags
     const oldScripts = document.querySelectorAll('script[data-type="jsonp-report"]');
     oldScripts.forEach(s => s.remove());
 
@@ -139,7 +129,6 @@ function parseGVizData(json) {
         const headers = json.table.cols.map(c => c ? (c.label || '').trim().toLowerCase() : '');
         const rows = json.table.rows;
         
-        // Find indexes
         const idx = {
             sku: headers.indexOf('sku_code'),
             name: headers.indexOf('product_name'),
@@ -150,14 +139,13 @@ function parseGVizData(json) {
             locationFrom: headers.indexOf('location_from')
         };
         
-        // Fallbacks if header mapping fails
         if (idx.sku === -1) idx.sku = 13;
         if (idx.name === -1) idx.name = 15;
         if (idx.qty === -1) idx.qty = 17;
         if (idx.amt === -1) idx.amt = 18;
         if (idx.date === -1) idx.date = 20;
         if (idx.price === -1) idx.price = 16;
-        if (idx.locationFrom === -1) idx.locationFrom = 10; // fallback col index
+        if (idx.locationFrom === -1) idx.locationFrom = 10;
 
         const getSafeStr = (cell) => {
             if (!cell || cell.v === null || cell.v === undefined) return '';
@@ -175,7 +163,7 @@ function parseGVizData(json) {
             return {
                 sku: getSafeStr(r.c[idx.sku]),
                 name: getSafeStr(r.c[idx.name]),
-                qty: Math.abs(getSafeNum(r.c[idx.qty])), // make it absolute for stats
+                qty: Math.abs(getSafeNum(r.c[idx.qty])),
                 amt: Math.abs(getSafeNum(r.c[idx.amt])),
                 timestamp: getSafeStr(r.c[idx.date]),
                 price: getSafeNum(r.c[idx.price]),
@@ -187,17 +175,13 @@ function parseGVizData(json) {
 
     } catch (e) {
         console.error("Parse GViz Error:", e);
-        if (topProductsList) {
-            topProductsList.innerHTML = `<div style="color:#f87171; text-align:center; padding:20px;">Lỗi tải dữ liệu: ${e.message}</div>`;
-        }
     }
 }
 
 function processAggregations() {
-    // 1. Calculations
-    const dailyMap = {}; // date -> qty or amt
+    const dailyMap = {};
     const shiftMap = { 'Ca 1': 0, 'Ca 2': 0, 'Ca 3': 0, 'Khác': 0 };
-    const productMap = {}; // sku -> { name, qty, amt, price }
+    const productMap = {};
     let totalSkusSet = new Set();
     let totalMoney = 0;
     
@@ -205,15 +189,11 @@ function processAggregations() {
         const date = getDateFromTimestamp(item.timestamp);
         const shift = getShiftFromTime(item.timestamp);
         
-        // Accumulate daily (depending on Qty or Amt chart mode)
         dailyMap[date] = (dailyMap[date] || 0) + (chartMode === 'qty' ? item.qty : item.amt);
-        
-        // Accumulate shifts (depending on Qty or Amt chart mode)
         shiftMap[shift] = (shiftMap[shift] || 0) + (chartMode === 'qty' ? item.qty : item.amt);
         
-        // Accumulate products
         if (!productMap[item.sku]) {
-            productMap[item.sku] = { name: item.name, qty: 0, amt: 0, price: item.price };
+            productMap[item.sku] = { name: item.name, qty: 0, amt: item.amt, price: item.price };
         }
         productMap[item.sku].qty += item.qty;
         productMap[item.sku].amt += item.amt;
@@ -222,11 +202,10 @@ function processAggregations() {
         totalMoney += item.amt;
     });
 
-    // 2. Update Bento Stats
-    statTotalSkus.textContent = totalSkusSet.size.toLocaleString('vi-VN');
-    statTotalMoney.textContent = formatCurrency(totalMoney);
+    // Update Stats Cards
+    if (statTotalSkus) statTotalSkus.textContent = totalSkusSet.size.toLocaleString('vi-VN');
+    if (statTotalMoney) statTotalMoney.textContent = formatCurrency(totalMoney);
     
-    // Day peak (always based on selected chartMode for consistency)
     let peakDate = '-';
     let peakDateVal = 0;
     Object.keys(dailyMap).forEach(d => {
@@ -235,12 +214,13 @@ function processAggregations() {
             peakDate = d;
         }
     });
-    statPeakDate.textContent = peakDate;
-    statPeakDateDesc.textContent = chartMode === 'qty' 
-        ? `Lệch lớn nhất: ${peakDateVal.toLocaleString('vi-VN')} SP`
-        : `Thất thoát lớn nhất: ${formatCurrency(peakDateVal)}`;
+    if (statPeakDate) statPeakDate.textContent = peakDate;
+    if (statPeakDateDesc) {
+        statPeakDateDesc.innerHTML = chartMode === 'qty' 
+            ? `<i class='bx bx-check-circle'></i> <span>Lệch lớn nhất: ${peakDateVal.toLocaleString('vi-VN')} SP</span>`
+            : `<i class='bx bx-check-circle'></i> <span>Lệch lớn: ${formatCurrency(peakDateVal)}</span>`;
+    }
     
-    // Shift peak
     let peakShift = '-';
     let peakShiftVal = 0;
     Object.keys(shiftMap).forEach(s => {
@@ -249,78 +229,35 @@ function processAggregations() {
             peakShift = s;
         }
     });
-    statPeakShift.textContent = peakShift;
+    if (statPeakShift) statPeakShift.textContent = peakShift;
     const totalShiftQty = Object.values(shiftMap).reduce((a,b) => a+b, 0) || 1;
     const shiftPercent = ((peakShiftVal / totalShiftQty) * 100).toFixed(1);
-    statPeakShiftDesc.textContent = `Chiếm ${shiftPercent}% tổng ${chartMode === 'qty' ? 'số lượng' : 'giá trị'} missing`;
+    if (statPeakShiftDesc) {
+        statPeakShiftDesc.innerHTML = `<i class='bx bx-bar-chart-alt-2'></i> <span>Chiếm ${shiftPercent}% tổng số lượng missing</span>`;
+    }
 
     const shiftUnitLabel = document.getElementById('shiftUnitLabel');
     if (shiftUnitLabel) {
         shiftUnitLabel.textContent = chartMode === 'qty' ? 'Theo lượng chênh lệch' : 'Theo giá trị chênh lệch';
     }
 
-    // 3. Render Top Products List
-    renderTopProducts(productMap);
-
-    // 4b. Render Kệ Pa / Kệ Xám tables
+    // Render Shelf Tables
     renderShelfTables(reportData);
 
-    // 4. Update Charts
+    // Update Charts
     updateCharts(dailyMap, shiftMap);
 }
 
-function renderTopProducts(productMap) {
-    const sorted = Object.keys(productMap).map(sku => ({
-        sku: sku,
-        name: productMap[sku].name,
-        qty: productMap[sku].qty,
-        amt: productMap[sku].amt,
-        price: productMap[sku].price
-    })).sort((a, b) => b.qty - a.qty).slice(0, 10);
-    
-    if (sorted.length === 0) {
-        topProductsList.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-dim);">Không có sản phẩm nào chênh lệch</div>`;
-        return;
-    }
-
-    const maxQty = sorted[0].qty || 1;
-    
-    topProductsList.innerHTML = sorted.map((item, idx) => {
-        const percent = ((item.qty / maxQty) * 100).toFixed(0);
-        const rankClass = idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'));
-        return `
-            <div class="top-item">
-                <div class="top-rank ${rankClass}">${idx + 1}</div>
-                <div class="top-info">
-                    <div class="top-name" title="${item.name}">${item.name}</div>
-                    <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px;">
-                        SKU: ${item.sku} &nbsp;•&nbsp; 
-                        Đơn giá: ${item.price > 0 ? formatCurrency(item.price) : 'Chưa rõ'}
-                    </div>
-                    <div class="top-progress-bar">
-                        <div class="top-progress-fill" style="width: ${percent}%;"></div>
-                    </div>
-                </div>
-                <div class="top-val-box">
-                    <div class="top-val-qty">${item.qty.toLocaleString('vi-VN')} SP</div>
-                    <div class="top-val-money">${formatCurrency(item.amt)}</div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
 function updateCharts(dailyMap, shiftMap) {
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#94A3B8' : '#64748B';
-    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
     const isAmt = chartMode === 'amt';
+    const textColor = '#6b7280';
+    const gridColor = '#f3f4f6';
 
     // A. Daily Chart
     const dailyLabels = Object.keys(dailyMap).sort((a,b) => {
         const parseD = s => {
             const p = s.split('/');
-            return new Date(p[2], p[1]-1, p[0]);
+            return new Date(p[2] || 2026, (p[1]||1)-1, p[0]||1);
         };
         return parseD(a) - parseD(b);
     });
@@ -336,11 +273,11 @@ function updateCharts(dailyMap, shiftMap) {
             datasets: [{
                 label: isAmt ? 'Giá trị chênh lệch (đ)' : 'Số lượng chênh lệch (SP)',
                 data: dailyValues,
-                backgroundColor: isAmt ? 'rgba(168, 85, 247, 0.45)' : 'rgba(99, 102, 241, 0.45)',
-                borderColor: isAmt ? '#a855f7' : '#6366f1',
-                borderWidth: 2,
-                borderRadius: 8,
-                hoverBackgroundColor: isAmt ? '#c084fc' : '#818cf8'
+                backgroundColor: 'rgba(167, 139, 250, 0.65)',
+                borderColor: '#7c3aed',
+                borderWidth: 1.5,
+                borderRadius: 6,
+                hoverBackgroundColor: '#8b5cf6'
             }]
         },
         options: {
@@ -359,6 +296,11 @@ function updateCharts(dailyMap, shiftMap) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    backgroundColor: '#1e1b4b',
+                    titleColor: '#fff',
+                    bodyColor: '#e0e7ff',
+                    padding: 10,
+                    borderRadius: 8,
                     callbacks: {
                         label: function(context) { 
                             return isAmt 
@@ -370,14 +312,15 @@ function updateCharts(dailyMap, shiftMap) {
             },
             scales: {
                 x: {
-                    ticks: { color: textColor },
+                    ticks: { color: textColor, font: { size: 10 } },
                     grid: { display: false }
                 },
                 y: {
                     ticks: { 
                         color: textColor,
+                        font: { size: 10 },
                         callback: function(value) {
-                            return isAmt ? (value >= 1e6 ? (value/1e6)+'M đ' : value.toLocaleString('vi-VN')) : value;
+                            return isAmt ? (value >= 1e6 ? (value/1e6)+'M' : value.toLocaleString('vi-VN')) : value;
                         }
                     },
                     grid: { color: gridColor }
@@ -389,6 +332,19 @@ function updateCharts(dailyMap, shiftMap) {
     // B. Shift Chart
     const shiftLabels = ['Ca 1 (06h - 14h)', 'Ca 2 (14h - 22h)', 'Ca 3 (22h - 06h)'];
     const shiftValues = [shiftMap['Ca 1'] || 0, shiftMap['Ca 2'] || 0, shiftMap['Ca 3'] || 0];
+    const totalShift = (shiftValues[0] + shiftValues[1] + shiftValues[2]) || 1;
+
+    // Update bottom percentage cards
+    const p1 = ((shiftValues[0] / totalShift) * 100).toFixed(1);
+    const p2 = ((shiftValues[1] / totalShift) * 100).toFixed(1);
+    const p3 = ((shiftValues[2] / totalShift) * 100).toFixed(1);
+
+    const elP1 = document.getElementById('legendPct1');
+    const elP2 = document.getElementById('legendPct2');
+    const elP3 = document.getElementById('legendPct3');
+    if (elP1) elP1.textContent = p1 + '%';
+    if (elP2) elP2.textContent = p2 + '%';
+    if (elP3) elP3.textContent = p3 + '%';
 
     if (shiftChart) shiftChart.destroy();
     
@@ -400,29 +356,30 @@ function updateCharts(dailyMap, shiftMap) {
             datasets: [{
                 data: shiftValues,
                 backgroundColor: [
-                    'rgba(245, 158, 11, 0.75)',  // amber/yellow for day
-                    'rgba(99, 102, 241, 0.75)',  // indigo for evening
-                    'rgba(239, 68, 68, 0.75)'    // red for night
+                    '#7c3aed', // Purple for Ca 1
+                    '#f59e0b', // Amber for Ca 2
+                    '#ef4444'  // Red for Ca 3
                 ],
-                borderColor: isDark ? '#0f172a' : '#fff',
+                borderColor: '#ffffff',
                 borderWidth: 3,
-                hoverOffset: 12
+                hoverOffset: 8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: textColor, padding: 16, font: { size: 12, weight: 600 } }
-                },
+                legend: { display: false },
                 tooltip: {
+                    backgroundColor: '#1e1b4b',
+                    titleColor: '#fff',
+                    bodyColor: '#e0e7ff',
+                    padding: 10,
+                    borderRadius: 8,
                     callbacks: {
                         label: function(context) {
                             const val = context.raw;
-                            const total = context.dataset.data.reduce((a,b)=>a+b,0) || 1;
-                            const pct = ((val / total) * 100).toFixed(1);
+                            const pct = ((val / totalShift) * 100).toFixed(1);
                             return isAmt 
                                 ? ` ${context.label}: ${formatCurrency(val)} (${pct}%)`
                                 : ` ${context.label}: ${val.toLocaleString('vi-VN')} SP (${pct}%)`;
@@ -430,7 +387,7 @@ function updateCharts(dailyMap, shiftMap) {
                     }
                 }
             },
-            cutout: '68%'
+            cutout: '72%'
         }
     });
 }
@@ -448,10 +405,7 @@ window.showDailyDetailModal = function(dateStr) {
     const tbody = document.getElementById('dailyDetailTableBody');
     if (!overlay || !tbody) return;
 
-    // Filter reportData
     const items = reportData.filter(item => getDateFromTimestamp(item.timestamp) === dateStr);
-    
-    // Sort by qty desc
     items.sort((a, b) => b.qty - a.qty);
 
     title.textContent = dateStr;
@@ -463,21 +417,20 @@ window.showDailyDetailModal = function(dateStr) {
         totalQty += item.qty;
         totalAmt += item.amt;
         return `
-            <tr style="border-bottom: 1px solid var(--white-alpha-5); transition: background 0.2s;">
-                <td style="padding: 12px 16px; font-family: monospace; font-size: 11px; color: #94a3b8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.sku}</td>
-                <td style="padding: 12px 16px; font-size: 13px; color: #e2e8f0; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">${item.name}</td>
-                <td style="padding: 12px 16px; font-size: 13px; color: #94a3b8; text-align: right;">${item.price > 0 ? formatCurrency(item.price) : 'Chưa rõ'}</td>
-                <td style="padding: 12px 16px; font-size: 13px; color: #f87171; text-align: right; font-weight: 700;">-${item.qty.toLocaleString('vi-VN')} SP</td>
-                <td style="padding: 12px 16px; font-size: 13px; color: #ff8a8a; text-align: right; font-weight: 700;">-${formatCurrency(item.amt)}</td>
+            <tr style="border-bottom: 1px solid #f3f4f6; transition: background 0.15s;">
+                <td style="padding: 10px 14px; font-family: monospace; font-size: 11px; color: #7c3aed; font-weight: 600;">${item.sku}</td>
+                <td style="padding: 10px 14px; font-size: 12px; color: #374151;" title="${item.name}">${item.name}</td>
+                <td style="padding: 10px 14px; font-size: 12px; color: #6b7280; text-align: right;">${item.price > 0 ? formatCurrency(item.price) : 'Chưa rõ'}</td>
+                <td style="padding: 10px 14px; font-size: 12px; color: #ef4444; text-align: right; font-weight: 700;">-${item.qty.toLocaleString('vi-VN')} SP</td>
+                <td style="padding: 10px 14px; font-size: 12px; color: #b91c1c; text-align: right; font-weight: 700;">-${formatCurrency(item.amt)}</td>
             </tr>
         `;
     }).join('');
 
-    summary.textContent = `Tổng cộng: ${items.length} SKU, Số lượng lệch: ${totalQty.toLocaleString('vi-VN')} SP, Tổng tiền chênh lệch: ${formatCurrency(totalAmt)}`;
+    summary.textContent = `Tổng cộng: ${items.length} SKU • Số lượng lệch: ${totalQty.toLocaleString('vi-VN')} SP • Tổng tiền chênh lệch: ${formatCurrency(totalAmt)}`;
 
     overlay.classList.add('active');
 };
-
 
 // ============================================================
 // RENDER KE PA & KE XAM TABLES
@@ -496,39 +449,49 @@ function renderShelfTables(data) {
         map[item.sku].qty += item.qty;
     });
 
-    renderOneShelfTable('shelfPaTableBody', paSku, 'shelfPaBadge');
-    renderOneShelfTable('shelfXamTableBody', xamSku, 'shelfXamBadge');
+    renderOneShelfTable('shelfPaTableBody', paSku, 'shelfPaSeeAll');
+    renderOneShelfTable('shelfXamTableBody', xamSku, 'shelfXamSeeAll');
 }
 
-function renderOneShelfTable(tbodyId, skuMap, badgeId) {
+function renderOneShelfTable(tbodyId, skuMap, seeAllBtnId) {
     var tbody = document.getElementById(tbodyId);
     if (!tbody) return;
 
     var sorted = Object.values(skuMap).sort(function(a, b) { return b.qty - a.qty; });
 
-    // Update badge count
-    var badge = badgeId ? document.getElementById(badgeId) : null;
-    if (badge) badge.textContent = sorted.length + ' SKU';
+    var seeAllBtn = seeAllBtnId ? document.getElementById(seeAllBtnId) : null;
+    if (seeAllBtn) {
+        if (sorted.length > 5) {
+            seeAllBtn.style.display = 'inline-block';
+            seeAllBtn.dataset.expanded = 'false';
+            seeAllBtn.textContent = 'Xem tất cả →';
+        } else {
+            seeAllBtn.style.display = 'none';
+        }
+    }
 
     if (sorted.length === 0) {
-        tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Chưa có dữ liệu</td></tr>';
+        tbody.innerHTML = '<tr><td class="empty-cell" colspan="3">Chưa có dữ liệu</td></tr>';
         return;
     }
 
     var html = '';
-    sorted.forEach(function(item) {
-        var sku = item.sku || '';
-        var name = (item.name || '').replace(/"/g, '&quot;');
+    sorted.forEach(function(item, idx) {
         var loc = item.locationFrom || '-';
+        var name = (item.name || '').replace(/"/g, '&quot;');
         var qty = item.qty.toLocaleString('vi-VN');
-        html += '<tr>';
-        html += '<td class="td-sku" title="' + sku + '">' + sku + '</td>';
+        var isExtra = idx >= 5;
+        var style = isExtra ? ' style="display:none;"' : '';
+        var cls = isExtra ? ' class="shelf-row-extra"' : '';
+
+        html += '<tr' + cls + style + '>';
+        html += '<td class="td-sku" title="' + loc + '">' + loc + '</td>';
         html += '<td class="td-name" title="' + name + '">' + name + '</td>';
         html += '<td class="td-qty">' + qty + '</td>';
-        html += '<td class="td-loc" title="' + loc + '">' + loc + '</td>';
         html += '</tr>';
     });
     tbody.innerHTML = html;
 }
+
 // Run
 init();

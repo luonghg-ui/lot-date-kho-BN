@@ -1,50 +1,52 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Báo Cáo Missing – Kho Thuocsi</title>
-    <meta name="description" content="Báo cáo phân tích dữ liệu missing, chênh lệch tồn kho theo ngày, ca làm việc và top sản phẩm.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <script src="../assets/js/theme.js"></script>
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAThSURBVHhe7ZYxUuQwEEU5HemehISLEOw9KM4xxTVmqkgICEgIvCVmPRiNrf4te6xW/d9VL9lFlsd63V93f+6Pg+DlLv8HwYUEIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoCc9gI8fQ5wHd6v1zt4fP7Kn7hcK/aC91mxx1a0F+D+fXjNP8xSHT+Gx6v1OH8P+QMLtWIvdJ/Xp+u1exNAgLfh5Zh/mqX6Gl4e8vUoDtG+q3YvdJ/a529LAAEcI3NN1zx8DKf8YUZV7YXus2LCbEkIATz3gNPz2/V6AI9kl6rJaPC31P6OrYkhADw2azvHEzOTqtgLFa1qutyAIALgF6dh+Bz+zqwv4xDsV3lzGhWt5jfchjACoJ3jPxR8LM+Vr1NB0Somy60IIwB8eXIfime6zJTnHgD+hij5n4gjANo9qTyHAo/lhfJ0KzRpKibYDQkkgKNTPYcCduVy4XmNvT/+vD0IJQB+D3B8RKMrXw/l/0+FRQ44aVzT6/aEEgDvVnyMWl2JCIBlNhZh2LP2I5YAaBfBH9I6lK/h5QmQDokcSF5c3L0IJoDdsZdCRql5KClKLElS2ZGDxZf9nL0JJ4CV2ZcCutI8lO9nYFPHugdA4iLS7kw8AcyuHcvqJvtgxxhBDq8cOfZeqSyJWhBPAPBjpip/UHu0X9YjU6c4cey9IuZ/IqAAWEemKnaleaiTCQJNncLEQdYXBWpHSAHsw/tfhUw1Jfq1Fps6SxPHvGukKrxrS2IKAI3UUlfZB5pPD1OYmTWetUvytCaoAPYBnmshV82RPLMOmTqzwiHvOrNfEIIKAI7Vpc4yD3Muz5GpU7luVpwYhBXAPsRzzY1lcyTP5nFlJwPvOfeOUYgrANJZqa66y143OzXAqZMfJrJmab8IBBYA6chU2Viuyf8RoJvz6WFOm/z9ghFYAKy78gM111xNjCn29Ph9oICkxf3aE1oAu5vP9TNigQOZzX/H+qlwwPvlkRGN2AJAHTk9VPvvrTw2J8j0UM3IKMRNEIILgGTsZMxucSDmM36Es2WJnf+J8ALYHznV+UObfwvlsT1Fxv1MOYtxE4PwAiA5e+5sO7+xPLafs+1+bYkvANSRKdvtv7Pyf8ScJNB+QNwEoAMBgFGbDuTZmhSOPAamzunwafyNY7+GdCEAcjE7HY2uhfJ/xOpuQIAO8j/RhwBAR1rlzWNk6pQKjZvW9CEAdDErlT+PkXvAcvn3a0UnAqztyIo8XjN1XHHTlm4EQO4Bi1WVx/Y9YLGq9mtDPwKs6Ehv/o/UTp1e8j/RjwDV94D6PK67B9Tv14KOBKg9kIr8H6mZOh3lf6IrAaruAavy2H8PqI2bVvQlQMWBrM1j7z1g7X5705kA3nvABnnsmjor4qYRnQkgtkYCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApAjAciRAORIAHIkADkSgBwJQI4EIEcCkCMByJEA5EgAciQAORKAHAlAjgQgRwKQIwHIkQDkSAByJAA5EoAcCUCOBCBHApDzD5d+UnG9FrasAAAAAElFTkSuQmCC">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH6AkKCjEsMbOLvQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAFzSURBVHja7dAxAQAAAMKg909tDjehAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwDABDAAFiJYjDAAAAAElFTkSuQmCC">
 </head>
 
 <style>
-/* ===== RESET & BASE ===== */
+/* ===== CSS RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
-    --sidebar-width: 72px;
-    --bg-primary: #070b13;
-    --bg-card: rgba(15, 23, 42, 0.85);
-    --bg-card-hover: rgba(22, 33, 55, 0.9);
-    --border: rgba(255,255,255,0.06);
-    --border-hover: rgba(99,102,241,0.3);
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-dim: #475569;
-    --accent: #6366f1;
-    --accent-soft: rgba(99,102,241,0.12);
-    --purple: #a855f7;
-    --red: #f87171;
-    --green: #34d399;
-    --blue: #60a5fa;
-    --amber: #fbbf24;
-    --radius-card: 20px;
+    --bg: #f5f3ff;
+    --bg2: #ede9fe;
+    --card: #ffffff;
+    --purple: #7c3aed;
+    --purple-500: #8b5cf6;
+    --purple-100: #ede9fe;
+    --purple-50: #f5f3ff;
+    --text-dark: #1e1b4b;
+    --text-mid: #4c4a7a;
+    --text-body: #374151;
+    --text-gray: #6b7280;
+    --text-muted: #9ca3af;
+    --border: rgba(124,58,237,0.1);
+    --border-gray: #e5e7eb;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(124,58,237,0.04);
+    --shadow-md: 0 4px 16px rgba(124,58,237,0.1), 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 32px rgba(124,58,237,0.18), 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 16px;
     --radius-sm: 10px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.35);
+    --radius-xs: 8px;
     --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    --sidebar-w: 72px;
+    --red: #ef4444;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --blue: #3b82f6;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: var(--bg);
+    color: var(--text-body);
     font-family: 'Inter', sans-serif;
     display: flex;
     min-height: 100vh;
@@ -55,21 +57,17 @@ body {
 .app-container { display: flex; width: 100vw; min-height: 100vh; }
 
 .sidebar {
-    width: var(--sidebar-width);
-    background: rgba(10,15,28,0.95);
-    border-right: 1px solid var(--border);
+    width: var(--sidebar-w);
+    background: #0f0a28;
+    border-right: 1px solid rgba(255,255,255,0.05);
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px 0;
     flex-shrink: 0;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    backdrop-filter: blur(20px);
+    position: sticky; top: 0; height: 100vh;
 }
-
 .sidebar-brand {
     width: 40px; height: 40px;
     border-radius: 12px;
@@ -80,565 +78,631 @@ body {
     margin-bottom: 24px;
 }
 .sidebar-brand svg { width: 20px; height: 20px; }
-
-.sidebar-nav {
-    display: flex; flex-direction: column;
-    gap: 6px; width: 100%;
-    align-items: center; flex-grow: 1;
-}
-
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; width: 100%; align-items: center; flex-grow: 1; }
 .sidebar-item {
     width: 52px; height: 52px;
     border-radius: 14px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    color: var(--text-dim);
-    text-decoration: none;
-    gap: 4px;
-    transition: var(--transition);
-    border: 1px solid transparent;
-    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #64748b; text-decoration: none; gap: 4px;
+    transition: var(--transition); border: 1px solid transparent;
 }
 .sidebar-item svg { width: 18px; height: 18px; }
-.sidebar-item span { font-size: 9px; font-weight: 600; letter-spacing: 0.01em; }
+.sidebar-item span { font-size: 9px; font-weight: 600; }
 .sidebar-item:hover { color: #a78bfa; background: rgba(168,85,247,0.1); }
-.sidebar-item.active {
-    color: #fff;
-    background: rgba(99,102,241,0.2);
-    border-color: rgba(99,102,241,0.3);
-    box-shadow: 0 0 16px rgba(99,102,241,0.15);
-}
-
+.sidebar-item.active { color: #fff; background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.3); }
 .sidebar-footer { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
-.status-label { font-size: 8px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
-.status-name { font-size: 9px; font-weight: 600; color: #64748b; }
+.s-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
+.s-label { font-size: 8px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .06em; }
 
-/* ===== MAIN WRAPPER ===== */
+/* ===== MAIN CONTENT ===== */
 .main-wrapper {
-    flex-grow: 1;
-    padding: 24px 28px;
-    display: flex; flex-direction: column; gap: 20px;
+    flex: 1;
+    padding: 20px 24px 32px;
+    display: flex; flex-direction: column; gap: 18px;
     overflow-y: auto; max-height: 100vh;
+    background: var(--bg);
 }
+.main-wrapper::-webkit-scrollbar { width: 4px; }
+.main-wrapper::-webkit-scrollbar-thumb { background: var(--purple-100); border-radius: 4px; }
 
-/* ===== HEADER ===== */
+/* ===== PAGE HEADER ===== */
 .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: 4px;
 }
-.page-brand { display: flex; align-items: center; gap: 12px; }
-.page-brand-icon {
-    width: 38px; height: 38px;
-    border-radius: 11px;
-    background: rgba(99,102,241,0.12);
-    border: 1px solid rgba(99,102,241,0.2);
+.brand-row { display: flex; align-items: center; gap: 12px; }
+.brand-icon-wrap {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
     display: flex; align-items: center; justify-content: center;
-    color: #818cf8;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+    flex-shrink: 0;
 }
-.page-brand-icon svg { width: 18px; height: 18px; }
-.page-title { font-size: 18px; font-weight: 800; color: #fff; font-family: 'Outfit',sans-serif; letter-spacing: -0.02em; }
-.page-subtitle { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-.header-actions { display: flex; align-items: center; gap: 6px; }
-.icon-btn {
+.brand-icon-wrap svg { width: 20px; height: 20px; }
+.brand-title { font-size: 20px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; letter-spacing: -.02em; }
+.brand-sub { font-size: 11px; color: var(--text-gray); margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.date-pill {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--card); border: 1px solid var(--border-gray);
+    border-radius: 10px; padding: 7px 14px;
+    font-size: 12px; font-weight: 600; color: var(--text-body);
+    cursor: pointer; transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+.date-pill:hover { border-color: var(--purple); color: var(--purple); }
+.date-pill i { font-size: 14px; color: var(--purple); }
+.hdr-btn {
     width: 36px; height: 36px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: rgba(30,41,59,0.5);
-    color: var(--text-secondary);
+    background: var(--card); border: 1px solid var(--border-gray);
+    border-radius: 10px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: var(--transition);
-    font-size: 17px;
+    color: var(--text-gray); font-size: 17px;
+    box-shadow: var(--shadow-sm); transition: var(--transition);
 }
-.icon-btn:hover { border-color: rgba(99,102,241,0.3); color: #818cf8; background: rgba(99,102,241,0.08); }
-.icon-btn.primary { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.3); color: #818cf8; }
-.icon-btn.primary:hover { background: rgba(99,102,241,0.25); }
+.hdr-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-50); }
+.hdr-btn.refresh { background: var(--purple-100); border-color: rgba(124,58,237,0.25); color: var(--purple); }
+.hdr-btn.refresh:hover { background: var(--purple); color: #fff; }
 
 /* ===== STAT CARDS ===== */
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-}
-.stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 18px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    position: relative;
-    overflow: hidden;
-    transition: var(--transition);
-    box-shadow: var(--shadow);
-}
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
-.stat-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-2px); }
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
 
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border-gray);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    overflow: hidden;
+    position: relative;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--border); }
+
+.stat-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; flex: 1; }
 .stat-icon {
-    width: 42px; height: 42px; flex-shrink: 0;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
 }
 .stat-icon svg { width: 18px; height: 18px; }
-.stat-icon.red   { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-.stat-icon.purple{ background: rgba(168,85,247,0.1);  color: #c084fc; border: 1px solid rgba(168,85,247,0.2); }
-.stat-icon.blue  { background: rgba(96,165,250,0.1);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
-.stat-icon.green { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+.stat-icon.c-red    { background: #fef2f2; color: #ef4444; border: 1.5px solid #fecaca; }
+.stat-icon.c-purple { background: var(--purple-100); color: var(--purple); border: 1.5px solid #c4b5fd; }
+.stat-icon.c-blue   { background: #eff6ff; color: #3b82f6; border: 1.5px solid #bfdbfe; }
+.stat-icon.c-teal   { background: #f0fdfa; color: #0d9488; border: 1.5px solid #99f6e4; }
 
-.stat-body { flex: 1; min-width: 0; }
-.stat-label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
-.stat-value { font-size: 24px; font-weight: 800; color: #fff; font-family: 'Outfit',sans-serif; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.stat-value.sm { font-size: 18px; }
-.stat-desc { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+.stat-text { min-width: 0; }
+.stat-label { font-size: 10px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; white-space: nowrap; }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-value.sm { font-size: 20px; }
+.stat-value.xs { font-size: 17px; }
+.stat-trend { display: flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 10px; font-weight: 600; }
+.stat-trend.up-red   { color: #ef4444; }
+.stat-trend.up-green { color: #10b981; }
+.stat-trend.info     { color: #3b82f6; }
+.stat-trend.purple   { color: var(--purple); }
 
-/* ===== CHART CARDS ===== */
-.charts-grid {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 16px;
-}
+.stat-mini { flex-shrink: 0; display: flex; align-items: flex-end; }
+.stat-mini svg { opacity: 0.7; }
 
+/* ===== CARDS SHARED ===== */
 .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow);
+    background: var(--card);
+    border: 1px solid var(--border-gray);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
     transition: var(--transition);
 }
-.card:hover { border-color: rgba(255,255,255,0.09); }
+.card:hover { box-shadow: var(--shadow-md); border-color: var(--border); }
 
-.card-header {
+.card-hdr {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid var(--border-gray);
 }
 .card-title {
-    font-size: 13px; font-weight: 700; color: #e2e8f0;
+    font-size: 13px; font-weight: 700; color: var(--text-dark);
     display: flex; align-items: center; gap: 7px;
     font-family: 'Outfit', sans-serif;
 }
-.card-title i { color: var(--text-dim); font-size: 15px; }
-.card-body { padding: 20px; }
+.card-title i { color: var(--purple); font-size: 16px; }
+.card-body { padding: 16px 20px 20px; }
 
-.chart-wrap {
-    position: relative;
-    min-height: 260px;
-}
-.chart-wrap-donut {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 260px;
-}
-
-/* Toggle buttons */
-.toggle-group {
+/* ===== TOGGLE BUTTONS ===== */
+.toggle-pill {
     display: flex; gap: 2px;
-    background: rgba(0,0,0,0.3);
+    background: var(--purple-50);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 2px;
+    border-radius: 10px; padding: 2px;
 }
-.toggle-btn {
-    background: transparent;
-    color: var(--text-secondary);
-    border: none;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
+.t-btn {
+    background: transparent; border: none;
+    padding: 5px 12px; border-radius: 8px;
+    font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: var(--transition);
+    color: var(--text-gray);
 }
-.toggle-btn.active { background: var(--accent); color: #fff; }
+.t-btn.active { background: var(--purple); color: #fff; box-shadow: 0 2px 8px rgba(124,58,237,0.3); }
+.t-btn:not(.active):hover { color: var(--purple); background: var(--purple-100); }
+
+/* ===== CHARTS GRID ===== */
+.charts-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 14px; }
+
+.chart-wrap { position: relative; height: 260px; }
+.donut-container { position: relative; height: 240px; display: flex; align-items: center; justify-content: center; }
+.donut-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none; z-index: 1;
+}
+.donut-center .dc-label { font-size: 11px; color: var(--text-gray); font-weight: 600; }
+.donut-center .dc-pct { font-size: 22px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; line-height: 1.1; }
+
+.shift-legend {
+    display: flex; justify-content: center; gap: 20px;
+    padding: 12px 20px 4px;
+    border-top: 1px solid var(--border-gray);
+}
+.legend-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.legend-dot-row { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { font-size: 10px; color: var(--text-gray); }
+.legend-pct { font-size: 15px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; }
 
 /* ===== SHELF TABLES ===== */
-.shelf-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
+.shelf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-.shelf-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-}
-.shelf-card:hover { border-color: rgba(255,255,255,0.09); }
-
-.shelf-header {
+.shelf-hdr {
     display: flex; align-items: center; gap: 10px;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border-gray);
 }
-.shelf-header.pa  { background: linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(99,102,241,0.04) 100%); }
-.shelf-header.xam { background: linear-gradient(135deg, rgba(100,116,139,0.18) 0%, rgba(100,116,139,0.04) 100%); }
-
-.shelf-icon {
-    width: 30px; height: 30px;
-    border-radius: 9px;
+.shelf-icon-box {
+    width: 30px; height: 30px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
+    font-size: 15px; flex-shrink: 0;
 }
-.shelf-icon.pa  { background: rgba(99,102,241,0.2);  color: #818cf8; border: 1px solid rgba(99,102,241,0.35); }
-.shelf-icon.xam { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.35); }
+.shelf-icon-box.pa  { background: var(--purple-100); color: var(--purple); border: 1px solid #c4b5fd; }
+.shelf-icon-box.xam { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+.shelf-name { font-size: 14px; font-weight: 700; color: var(--text-dark); font-family: 'Outfit',sans-serif; flex: 1; }
+.btn-see-all {
+    background: var(--purple); color: #fff;
+    border: none; border-radius: 8px;
+    padding: 5px 12px; font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: var(--transition);
+    white-space: nowrap;
+}
+.btn-see-all:hover { background: #6d28d9; transform: translateX(2px); }
 
-.shelf-title { font-size: 14px; font-weight: 700; color: #fff; font-family: 'Outfit',sans-serif; }
-.shelf-badge {
-    margin-left: auto;
+.shelf-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.shelf-tbl colgroup col:nth-child(1) { width: 24%; }
+.shelf-tbl colgroup col:nth-child(2) { width: 58%; }
+.shelf-tbl colgroup col:nth-child(3) { width: 18%; }
+
+.shelf-tbl thead tr {
+    background: #fafafa;
+    border-bottom: 1px solid var(--border-gray);
+}
+.shelf-tbl th {
+    padding: 8px 12px;
     font-size: 10px; font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-}
-.shelf-badge.pa  { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.25); }
-.shelf-badge.xam { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
-
-.shelf-table-wrap { max-height: 400px; overflow-y: auto; }
-.shelf-table-wrap::-webkit-scrollbar { width: 4px; }
-.shelf-table-wrap::-webkit-scrollbar-track { background: transparent; }
-.shelf-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-
-.shelf-table {
-    width: 100%; border-collapse: collapse;
-    table-layout: fixed;
-}
-.shelf-table colgroup col:nth-child(1) { width: 24%; }
-.shelf-table colgroup col:nth-child(2) { width: 44%; }
-.shelf-table colgroup col:nth-child(3) { width: 16%; }
-.shelf-table colgroup col:nth-child(4) { width: 16%; }
-
-.shelf-table thead tr {
-    position: sticky; top: 0; z-index: 1;
-    background: rgba(13, 20, 38, 0.98);
-    border-bottom: 1px solid var(--border);
-}
-.shelf-table th {
-    padding: 9px 10px;
-    font-size: 9px; font-weight: 700;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
+    color: var(--text-gray); text-transform: uppercase; letter-spacing: .06em;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
-.shelf-table th:nth-child(3),
-.shelf-table th:nth-child(4) { text-align: right; }
-
-.shelf-table td {
-    padding: 9px 10px;
-    font-size: 11px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.shelf-tbl th:last-child { text-align: right; }
+.shelf-tbl td {
+    padding: 9px 12px;
+    font-size: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     vertical-align: middle;
 }
-.shelf-table tbody tr { transition: background 0.15s; }
-.shelf-table tbody tr:hover { background: rgba(255,255,255,0.03); }
-.shelf-table tbody tr:last-child td { border-bottom: none; }
+.shelf-tbl tbody tr:last-child td { border-bottom: none; }
+.shelf-tbl tbody tr:hover { background: var(--purple-50); }
+.shelf-tbl tbody tr { transition: background .15s; }
 
-.td-sku { font-family: monospace; font-size: 10px; color: var(--text-secondary); }
-.td-name { color: #cbd5e1; }
-.td-qty { color: var(--red); font-weight: 700; text-align: right; }
-.td-loc { color: #818cf8; text-align: right; font-size: 10px; }
+.td-sku  { font-family: monospace; font-size: 11px; color: var(--purple); font-weight: 600; }
+.td-name { color: var(--text-body); }
+.td-qty  { text-align: right; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; font-size: 13px; }
+.empty-cell { text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px; }
 
-.empty-row td {
-    text-align: center;
-    padding: 32px;
-    color: var(--text-dim);
-    font-size: 12px;
+/* ===== STATUS BANNER ===== */
+#statusBanner {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 999;
 }
+.banner.loading {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 20px;
+    box-shadow: var(--shadow-md);
+    font-size: 13px; font-weight: 600; color: var(--text-body);
+}
+.banner.loading i { color: var(--purple); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,10,40,0.6); backdrop-filter: blur(4px);
+    z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+    background: var(--card); border-radius: 20px;
+    padding: 28px; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    max-height: 90vh; display: flex; flex-direction: column;
+}
+.modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: #f3f4f6; border: 1px solid #e5e7eb;
+    color: var(--text-gray); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: var(--transition);
+}
+.modal-close:hover { background: #fee2e2; color: var(--red); border-color: #fecaca; }
+.modal-header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.modal-body { flex: 1; overflow-y: auto; }
+
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead tr { background: #f9fafb; border-bottom: 1px solid var(--border-gray); }
+.data-table th { padding: 10px 14px; font-size: 10px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: .06em; }
+.data-table td { padding: 10px 14px; font-size: 12px; color: var(--text-body); border-bottom: 1px solid #f3f4f6; }
+.table-responsive { max-height: 50vh; overflow-y: auto; border-radius: 10px; border: 1px solid var(--border-gray); }
+.table-responsive::-webkit-scrollbar { width: 4px; }
+.table-responsive::-webkit-scrollbar-thumb { background: var(--purple-100); border-radius: 4px; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
     .charts-grid { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 700px) {
     .shelf-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .main-wrapper { padding: 14px; gap: 12px; }
 }
-@media (max-width: 600px) {
-    .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .main-wrapper { padding: 16px; gap: 14px; }
-    .stat-card { padding: 14px; }
-    .stat-value { font-size: 18px; }
-}
-
-/* ===== SCROLLBAR ===== */
-.main-wrapper::-webkit-scrollbar { width: 5px; }
-.main-wrapper::-webkit-scrollbar-track { background: transparent; }
-.main-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 5px; }
 </style>
 
 <body>
-    <div class="mesh-bg"></div>
+<div class="app-container">
 
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div>
-                <div class="sidebar-brand">
-                    <i data-lucide="bar-chart-3"></i>
-                </div>
-                <nav class="sidebar-nav">
-                    <a href="data-missing.html" class="sidebar-item">
-                        <i data-lucide="layout-grid"></i>
-                        <span>Tổng quan</span>
-                    </a>
-                    <a href="report-missing.html" class="sidebar-item active">
-                        <i data-lucide="line-chart"></i>
-                        <span>Báo cáo</span>
-                    </a>
-                    <a href="doisoat.html" class="sidebar-item">
-                        <i data-lucide="shield-check"></i>
-                        <span>Đối soát</span>
-                    </a>
-                    <a href="candate.html" class="sidebar-item">
-                        <i data-lucide="bell"></i>
-                        <span>Cảnh báo</span>
-                    </a>
-                    <a href="#" class="sidebar-item" id="tokenBtn">
-                        <i data-lucide="settings"></i>
-                        <span>Cài đặt</span>
-                    </a>
-                </nav>
-            </div>
-            <div class="sidebar-footer">
-                <div class="status-dot"></div>
-                <span class="status-label">Báo Cáo</span>
-                <span class="status-name">Online</span>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-wrapper">
-
-            <!-- Header -->
-            <div class="page-header">
-                <div class="page-brand">
-                    <div class="page-brand-icon">
-                        <i data-lucide="pie-chart"></i>
-                    </div>
-                    <div>
-                        <div class="page-title">Báo Cáo Missing & Chênh Lệch</div>
-                        <div class="page-subtitle">Phân tích biểu đồ chênh lệch kiểm kê</div>
-                    </div>
-                </div>
-                <div class="header-actions">
-                    <button class="icon-btn theme-toggle" id="themeToggle" title="Chế độ sáng/tối">
-                        <i class='bx bx-sun'></i>
-                    </button>
-                    <button class="icon-btn" onclick="openPageNavigator()" title="Chuyển trang">
-                        <i class='bx bx-layer'></i>
-                    </button>
-                    <button class="icon-btn primary" id="refreshBtn" title="Làm mới dữ liệu">
-                        <i class='bx bx-refresh'></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats Row -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-icon red"><i data-lucide="package-x"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-label">Tổng SKU Missing</div>
-                        <div class="stat-value" id="statTotalSkus">-</div>
-                        <div class="stat-desc">Mặt hàng có chênh lệch âm</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon purple"><i data-lucide="coins"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-label">Tổng Tiền Thất Thoát</div>
-                        <div class="stat-value sm" id="statTotalMoney">-</div>
-                        <div class="stat-desc">Ước tính giá trị chênh lệch</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon blue"><i data-lucide="calendar-check"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-label">Ngày Bị Nhiều Nhất</div>
-                        <div class="stat-value sm" id="statPeakDate">-</div>
-                        <div class="stat-desc" id="statPeakDateDesc">Lớn nhất trong 1 ngày</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green"><i data-lucide="clock"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-label">Ca Bị Nhiều Nhất</div>
-                        <div class="stat-value sm" id="statPeakShift">-</div>
-                        <div class="stat-desc" id="statPeakShiftDesc">Tỷ lệ chênh lệch theo ca</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts -->
-            <div class="charts-grid">
-                <!-- Bar Chart -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class='bx bx-line-chart'></i>
-                            Biến động chênh lệch theo ngày
-                        </div>
-                        <div class="toggle-group">
-                            <button id="btnChartModeQty" class="toggle-btn active" onclick="setChartMode('qty')">Số lượng</button>
-                            <button id="btnChartModeAmt" class="toggle-btn" onclick="setChartMode('amt')">Giá trị (đ)</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-wrap">
-                            <canvas id="dailyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Doughnut Chart -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class='bx bx-pie-chart-alt'></i>
-                            Tỷ lệ Missing theo ca
-                        </div>
-                        <span id="shiftUnitLabel" style="font-size:11px; color:var(--text-dim);">Theo lượng chênh lệch</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-wrap-donut">
-                            <canvas id="shiftChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hidden topProductsList for JS compatibility -->
-            <div id="topProductsList" style="display:none;"></div>
-
-            <!-- Shelf Tables -->
-            <div class="shelf-grid">
-
-                <!-- Kệ Pa -->
-                <div class="shelf-card">
-                    <div class="shelf-header pa">
-                        <div class="shelf-icon pa"><i class='bx bx-cabinet'></i></div>
-                        <span class="shelf-title">Kệ Pa</span>
-                        <span class="shelf-badge pa" id="shelfPaBadge">– SKU</span>
-                    </div>
-                    <div class="shelf-table-wrap">
-                        <table class="shelf-table">
-                            <colgroup>
-                                <col><col><col><col>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Mã SKU</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th style="text-align:right;">SL</th>
-                                    <th style="text-align:right;">Kệ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="shelfPaTableBody">
-                                <tr class="empty-row"><td colspan="4">Đang tải...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Kệ Xám -->
-                <div class="shelf-card">
-                    <div class="shelf-header xam">
-                        <div class="shelf-icon xam"><i class='bx bx-cabinet'></i></div>
-                        <span class="shelf-title">Kệ Xám</span>
-                        <span class="shelf-badge xam" id="shelfXamBadge">– SKU</span>
-                    </div>
-                    <div class="shelf-table-wrap">
-                        <table class="shelf-table">
-                            <colgroup>
-                                <col><col><col><col>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Mã SKU</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th style="text-align:right;">SL</th>
-                                    <th style="text-align:right;">Kệ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="shelfXamTableBody">
-                                <tr class="empty-row"><td colspan="4">Đang tải...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-        </main>
-    </div>
-
-    <!-- Loading Banner -->
-    <div id="statusBanner" style="display:none;">
-        <div class="banner loading" id="bannerInner">
-            <i class='bx bx-loader-alt bx-spin'></i>
-            <span>Đang tải dữ liệu từ Google Sheets...</span>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-brand"><i data-lucide="bar-chart-3"></i></div>
+            <nav class="sidebar-nav">
+                <a href="data-missing.html" class="sidebar-item">
+                    <i data-lucide="layout-grid"></i><span>Tổng quan</span>
+                </a>
+                <a href="report-missing.html" class="sidebar-item active">
+                    <i data-lucide="line-chart"></i><span>Báo cáo</span>
+                </a>
+                <a href="doisoat.html" class="sidebar-item">
+                    <i data-lucide="shield-check"></i><span>Đối soát</span>
+                </a>
+                <a href="candate.html" class="sidebar-item">
+                    <i data-lucide="bell"></i><span>Cảnh báo</span>
+                </a>
+                <a href="#" class="sidebar-item" id="tokenBtn">
+                    <i data-lucide="settings"></i><span>Cài đặt</span>
+                </a>
+            </nav>
         </div>
-    </div>
+        <div class="sidebar-footer">
+            <div class="s-dot"></div>
+            <span class="s-label">Báo Cáo</span>
+        </div>
+    </aside>
 
-    <!-- Modal: Daily Detail -->
-    <div class="modal-overlay" id="dailyDetailModalOverlay">
-        <div class="modal-box" id="dailyDetailModalBox" style="max-width:900px; width:95%;">
-            <button class="modal-close" id="dailyDetailModalCloseBtn"><i class='bx bx-x'></i></button>
-            <div class="modal-header" style="flex-direction:column; align-items:flex-start; gap:8px;">
-                <h3 style="font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:10px; margin:0;">
-                    <i class='bx bx-calendar-event' style="color:#6366f1; font-size:1.4rem;"></i>
-                    Chi Tiết Missing Ngày <span id="selectedDateTitle" style="color:#6366f1;">--/--/----</span>
-                </h3>
-                <span id="selectedDateSummary" style="font-size:12px; color:#94a3b8;">--</span>
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-wrapper">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div class="brand-row">
+                <div class="brand-icon-wrap"><i data-lucide="box"></i></div>
+                <div>
+                    <div class="brand-title">Báo Cáo Missing &amp; Chênh Lệch</div>
+                    <div class="brand-sub">Phân tích báo cáo chênh lệch tồn kho</div>
+                </div>
             </div>
-            <div class="modal-body" style="padding-top:12px;">
-                <div class="table-responsive" style="max-height:52vh; overflow-y:auto; border-radius:12px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.05);">
-                    <table class="data-table" style="width:100%; border-collapse:collapse; text-align:left;">
+            <div class="header-right">
+                <div class="date-pill"><i class='bx bx-calendar'></i> <span id="headerDateLabel">Đang tải...</span></div>
+                <button class="hdr-btn theme-toggle" id="themeToggle" title="Chế độ sáng/tối"><i class='bx bx-sun'></i></button>
+                <button class="hdr-btn" onclick="openPageNavigator()" title="Chuyển trang"><i class='bx bx-layer'></i></button>
+                <button class="hdr-btn refresh" id="refreshBtn" title="Làm mới dữ liệu"><i class='bx bx-refresh'></i></button>
+            </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+
+            <!-- Card 1: SKU Missing -->
+            <div class="stat-card">
+                <div class="stat-left">
+                    <div class="stat-icon c-red"><i data-lucide="package-x"></i></div>
+                    <div class="stat-text">
+                        <div class="stat-label">Tổng SKU Missing</div>
+                        <div class="stat-value" id="statTotalSkus">–</div>
+                        <div class="stat-trend up-red">
+                            <i class='bx bx-trending-up'></i>
+                            <span>Mặt hàng có chênh lệch âm</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <svg width="72" height="40" viewBox="0 0 72 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 32 Q10 28 16 20 Q22 12 28 18 Q34 24 40 10 Q46 2 52 8 Q58 14 64 6 Q68 2 70 4" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <path d="M2 32 Q10 28 16 20 Q22 12 28 18 Q34 24 40 10 Q46 2 52 8 Q58 14 64 6 Q68 2 70 4 L70 40 L2 40 Z" fill="url(#redGrad)" opacity=".2"/>
+                        <defs><linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Card 2: Tiền Thất Thoát -->
+            <div class="stat-card">
+                <div class="stat-left">
+                    <div class="stat-icon c-purple"><i data-lucide="coins"></i></div>
+                    <div class="stat-text">
+                        <div class="stat-label">Tổng Tiền Thất Thoát</div>
+                        <div class="stat-value xs" id="statTotalMoney">–</div>
+                        <div class="stat-trend up-green">
+                            <i class='bx bx-trending-up'></i>
+                            <span>Ước tính giá trị chênh lệch</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <svg width="72" height="40" viewBox="0 0 72 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 30 Q12 26 18 22 Q26 16 32 20 Q38 24 44 12 Q50 4 56 10 Q62 16 68 8" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <path d="M2 30 Q12 26 18 22 Q26 16 32 20 Q38 24 44 12 Q50 4 56 10 Q62 16 68 8 L68 40 L2 40 Z" fill="url(#purpGrad)" opacity=".18"/>
+                        <defs><linearGradient id="purpGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient></defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Card 3: Ngày Peak -->
+            <div class="stat-card">
+                <div class="stat-left">
+                    <div class="stat-icon c-blue"><i data-lucide="calendar-check"></i></div>
+                    <div class="stat-text">
+                        <div class="stat-label">Ngày Bị Nhiều Nhất</div>
+                        <div class="stat-value sm" id="statPeakDate">–</div>
+                        <div class="stat-trend info" id="statPeakDateDesc">
+                            <i class='bx bx-up-arrow-alt'></i>
+                            <span>Lớn nhất trong tháng</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-mini" style="align-items:center;">
+                    <div style="width:48px;height:48px;border-radius:12px;background:#eff6ff;border:1.5px solid #bfdbfe;display:flex;align-items:center;justify-content:center;">
+                        <i class='bx bx-calendar-alt' style="font-size:22px;color:#3b82f6;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Ca Peak -->
+            <div class="stat-card">
+                <div class="stat-left">
+                    <div class="stat-icon c-teal"><i data-lucide="clock"></i></div>
+                    <div class="stat-text">
+                        <div class="stat-label">Ca Bị Nhiều Nhất</div>
+                        <div class="stat-value sm" id="statPeakShift">–</div>
+                        <div class="stat-trend purple" id="statPeakShiftDesc">
+                            <i class='bx bx-bar-chart-alt-2'></i>
+                            <span>Tỷ lệ chênh lệch theo ca</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-mini" style="align-items:flex-end; gap:3px; padding-bottom:4px;">
+                    <svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0"  y="20" width="10" height="16" rx="3" fill="#c4b5fd"/>
+                        <rect x="15" y="8"  width="10" height="28" rx="3" fill="#7c3aed"/>
+                        <rect x="30" y="14" width="10" height="22" rx="3" fill="#a78bfa"/>
+                    </svg>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+
+            <!-- Bar Chart -->
+            <div class="card">
+                <div class="card-hdr">
+                    <div class="card-title">
+                        <i class='bx bx-bar-chart-alt-2'></i>
+                        Biểu đồ phân tích theo ngày
+                    </div>
+                    <div class="toggle-pill">
+                        <button id="btnChartModeQty" class="t-btn active" onclick="setChartMode('qty')">Số lượng</button>
+                        <button id="btnChartModeAmt" class="t-btn" onclick="setChartMode('amt')">Giá trị</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Donut Chart -->
+            <div class="card" style="display:flex;flex-direction:column;">
+                <div class="card-hdr">
+                    <div class="card-title">
+                        <i class='bx bx-pie-chart-alt-2'></i>
+                        Tỷ lệ Missing theo ca
+                    </div>
+                    <span id="shiftUnitLabel" style="font-size:11px;color:var(--text-gray);">Theo lượng chênh lệch</span>
+                </div>
+                <div class="card-body" style="flex:1;padding-bottom:0;">
+                    <div class="donut-container">
+                        <div class="donut-center">
+                            <div class="dc-label">Tổng</div>
+                            <div class="dc-pct">100%</div>
+                        </div>
+                        <canvas id="shiftChart" style="max-height:220px;max-width:220px;"></canvas>
+                    </div>
+                </div>
+                <div class="shift-legend" id="shiftLegend">
+                    <div class="legend-item">
+                        <div class="legend-dot-row">
+                            <div class="legend-dot" style="background:#7c3aed;"></div>
+                            <span class="legend-name">Ca 1 (06h–14h)</span>
+                        </div>
+                        <div class="legend-pct" id="legendPct1">–</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot-row">
+                            <div class="legend-dot" style="background:#f59e0b;"></div>
+                            <span class="legend-name">Ca 2 (14h–22h)</span>
+                        </div>
+                        <div class="legend-pct" id="legendPct2">–</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot-row">
+                            <div class="legend-dot" style="background:#ef4444;"></div>
+                            <span class="legend-name">Ca 3 (22h–06h)</span>
+                        </div>
+                        <div class="legend-pct" id="legendPct3">–</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Hidden topProductsList for JS compatibility -->
+        <div id="topProductsList" style="display:none;"></div>
+
+        <!-- Shelf Tables -->
+        <div class="shelf-grid">
+
+            <!-- Kệ Pa -->
+            <div class="card">
+                <div class="shelf-hdr">
+                    <div class="shelf-icon-box pa"><i class='bx bx-cabinet'></i></div>
+                    <span class="shelf-name">Kệ Pa</span>
+                    <button class="btn-see-all" id="shelfPaSeeAll" onclick="toggleShelfSeeAll(this)" data-tbody-id="shelfPaTableBody" data-expanded="false" style="display:none;">Xem tất cả →</button>
+                </div>
+                <div>
+                    <table class="shelf-tbl">
+                        <colgroup><col><col><col></colgroup>
                         <thead>
-                            <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:#1a2235; position:sticky; top:0; z-index:1;">
-                                <th style="padding:11px 14px; font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em;">SKU</th>
-                                <th style="padding:11px 14px; font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em;">Tên sản phẩm</th>
-                                <th style="padding:11px 14px; font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em; text-align:right;">Đơn giá</th>
-                                <th style="padding:11px 14px; font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em; text-align:right;">Số lượng</th>
-                                <th style="padding:11px 14px; font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em; text-align:right;">Thành tiền</th>
+                            <tr>
+                                <th>Mã Kệ</th>
+                                <th>Tên Sản Phẩm</th>
+                                <th style="text-align:right;">SL</th>
                             </tr>
                         </thead>
-                        <tbody id="dailyDetailTableBody">
-                            <!-- Populated dynamically -->
+                        <tbody id="shelfPaTableBody">
+                            <tr><td class="empty-cell" colspan="3">Đang tải...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- Kệ Xám -->
+            <div class="card">
+                <div class="shelf-hdr">
+                    <div class="shelf-icon-box xam"><i class='bx bx-cabinet'></i></div>
+                    <span class="shelf-name">Kệ-Xám</span>
+                    <button class="btn-see-all" id="shelfXamSeeAll" onclick="toggleShelfSeeAll(this)" data-tbody-id="shelfXamTableBody" data-expanded="false" style="display:none;">Xem tất cả →</button>
+                </div>
+                <div>
+                    <table class="shelf-tbl">
+                        <colgroup><col><col><col></colgroup>
+                        <thead>
+                            <tr>
+                                <th>Mã Kệ</th>
+                                <th>Tên Sản Phẩm</th>
+                                <th style="text-align:right;">SL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shelfXamTableBody">
+                            <tr><td class="empty-cell" colspan="3">Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<!-- Status Banner -->
+<div id="statusBanner" style="display:none;">
+    <div class="banner loading" id="bannerInner">
+        <i class='bx bx-loader-alt bx-spin'></i>
+        <span>Đang tải dữ liệu từ Google Sheets...</span>
+    </div>
+</div>
+
+<!-- Modal: Daily Detail -->
+<div class="modal-overlay" id="dailyDetailModalOverlay">
+    <div class="modal-box" id="dailyDetailModalBox" style="max-width:860px;width:95%;">
+        <button class="modal-close" id="dailyDetailModalCloseBtn"><i class='bx bx-x'></i></button>
+        <div class="modal-header">
+            <h3 style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text-dark);display:flex;align-items:center;gap:10px;">
+                <span style="width:32px;height:32px;border-radius:9px;background:var(--purple-100);border:1.5px solid #c4b5fd;display:flex;align-items:center;justify-content:center;">
+                    <i class='bx bx-calendar-event' style="color:var(--purple);font-size:16px;"></i>
+                </span>
+                Chi Tiết Missing Ngày <span id="selectedDateTitle" style="color:var(--purple);">--/--/----</span>
+            </h3>
+            <span id="selectedDateSummary" style="font-size:12px;color:var(--text-gray);"></span>
+        </div>
+        <div class="modal-body">
+            <div class="table-responsive">
+                <table class="data-table" style="text-align:left;">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Tên sản phẩm</th>
+                            <th style="text-align:right;">Đơn giá</th>
+                            <th style="text-align:right;">Số lượng</th>
+                            <th style="text-align:right;">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyDetailTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+</div>
 
-    <script src="../assets/js/page-nav.js"></script>
-    <script src="../../settings.js"></script>
-    <script src="../assets/js/script-report-missing.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
-        });
-    </script>
+<script src="../assets/js/page-nav.js"></script>
+<script src="../../settings.js"></script>
+<script src="../assets/js/script-report-missing.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
+
+    // Update header date label
+    var d = new Date();
+    var months = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+    var el = document.getElementById('headerDateLabel');
+    if (el) el.textContent = months[d.getMonth()] + '/' + d.getFullYear();
+});
+
+// toggleShelfSeeAll - show/hide extra rows
+window.toggleShelfSeeAll = function(btn) {
+    var tbodyId = btn.dataset.tbodyId;
+    var tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    var expanded = btn.dataset.expanded === 'true';
+    var extras = tbody.querySelectorAll('.shelf-row-extra');
+    extras.forEach(function(r) { r.style.display = expanded ? 'none' : ''; });
+    btn.dataset.expanded = expanded ? 'false' : 'true';
+    btn.textContent = expanded ? 'Xem tất cả \u2192' : 'Thu g\u1ecdn \u2190';
+};
+</script>
 </body>
-
 </html>
