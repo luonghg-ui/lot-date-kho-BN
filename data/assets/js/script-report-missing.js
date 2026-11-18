@@ -27,20 +27,16 @@ let chartMode = 'qty'; // 'qty' or 'amt'
 
 window.setChartMode = function(mode) {
     chartMode = mode;
-    const btnQty = document.getElementById('btnChartModeQty');
-    const btnAmt = document.getElementById('btnChartModeAmt');
+    var btnQty = document.getElementById('btnChartModeQty');
+    var btnAmt = document.getElementById('btnChartModeAmt');
     if (btnQty && btnAmt) {
-        if (mode === 'qty') {
-            btnQty.style.background = '#6366f1';
-            btnQty.style.color = '#fff';
-            btnAmt.style.background = 'transparent';
-            btnAmt.style.color = '#94a3b8';
-        } else {
-            btnAmt.style.background = '#6366f1';
-            btnAmt.style.color = '#fff';
-            btnQty.style.background = 'transparent';
-            btnQty.style.color = '#94a3b8';
-        }
+        btnQty.classList.toggle('active', mode === 'qty');
+        btnAmt.classList.toggle('active', mode === 'amt');
+        // legacy inline style fallback
+        btnQty.style.background = mode === 'qty' ? '#6366f1' : 'transparent';
+        btnQty.style.color = mode === 'qty' ? '#fff' : '#94a3b8';
+        btnAmt.style.background = mode === 'amt' ? '#6366f1' : 'transparent';
+        btnAmt.style.color = mode === 'amt' ? '#fff' : '#94a3b8';
     }
     processAggregations();
 };
@@ -482,6 +478,7 @@ window.showDailyDetailModal = function(dateStr) {
     overlay.classList.add('active');
 };
 
+
 // ============================================================
 // RENDER KE PA & KE XAM TABLES
 // ============================================================
@@ -499,19 +496,22 @@ function renderShelfTables(data) {
         map[item.sku].qty += item.qty;
     });
 
-    renderOneShelfTable('shelfPaTableBody', paSku);
-    renderOneShelfTable('shelfXamTableBody', xamSku);
+    renderOneShelfTable('shelfPaTableBody', paSku, 'shelfPaBadge');
+    renderOneShelfTable('shelfXamTableBody', xamSku, 'shelfXamBadge');
 }
 
-
-function renderOneShelfTable(tbodyId, skuMap) {
+function renderOneShelfTable(tbodyId, skuMap, badgeId) {
     var tbody = document.getElementById(tbodyId);
     if (!tbody) return;
 
     var sorted = Object.values(skuMap).sort(function(a, b) { return b.qty - a.qty; });
 
+    // Update badge count
+    var badge = badgeId ? document.getElementById(badgeId) : null;
+    if (badge) badge.textContent = sorted.length + ' SKU';
+
     if (sorted.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#64748b;font-size:13px;">Chua co du lieu</td></tr>';
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Chưa có dữ liệu</td></tr>';
         return;
     }
 
@@ -521,15 +521,14 @@ function renderOneShelfTable(tbodyId, skuMap) {
         var name = (item.name || '').replace(/"/g, '&quot;');
         var loc = item.locationFrom || '-';
         var qty = item.qty.toLocaleString('vi-VN');
-        html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">';
-        html += '<td style="padding:9px 10px;font-family:monospace;font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + sku + '">' + sku + '</td>';
-        html += '<td style="padding:9px 10px;font-size:11px;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + name + '">' + name + '</td>';
-        html += '<td style="padding:9px 8px;font-size:12px;color:#f87171;font-weight:700;text-align:right;white-space:nowrap;">' + qty + '</td>';
-        html += '<td style="padding:9px 10px;font-size:11px;color:#818cf8;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + loc + '">' + loc + '</td>';
+        html += '<tr>';
+        html += '<td class="td-sku" title="' + sku + '">' + sku + '</td>';
+        html += '<td class="td-name" title="' + name + '">' + name + '</td>';
+        html += '<td class="td-qty">' + qty + '</td>';
+        html += '<td class="td-loc" title="' + loc + '">' + loc + '</td>';
         html += '</tr>';
     });
     tbody.innerHTML = html;
 }
-
 // Run
 init();
