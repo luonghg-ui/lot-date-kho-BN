@@ -16,36 +16,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --bg: #f5f3ff;
-    --bg2: #ede9fe;
+    --bg-page: #f6f3fe;
     --card: #ffffff;
     --purple: #7c3aed;
     --purple-500: #8b5cf6;
     --purple-100: #ede9fe;
     --purple-50: #f5f3ff;
     --text-dark: #1e1b4b;
-    --text-mid: #4c4a7a;
     --text-body: #374151;
     --text-gray: #6b7280;
     --text-muted: #9ca3af;
-    --border: rgba(124,58,237,0.1);
+    --border: rgba(124, 58, 237, 0.1);
     --border-gray: #e5e7eb;
-    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(124,58,237,0.04);
-    --shadow-md: 0 4px 16px rgba(124,58,237,0.1), 0 2px 8px rgba(0,0,0,0.06);
-    --shadow-hover: 0 8px 32px rgba(124,58,237,0.18), 0 4px 12px rgba(0,0,0,0.08);
-    --radius: 16px;
+    --shadow-card: 0 4px 20px rgba(124, 58, 237, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+    --radius: 18px;
     --radius-sm: 10px;
-    --radius-xs: 8px;
-    --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     --sidebar-w: 72px;
-    --red: #ef4444;
-    --green: #10b981;
-    --amber: #f59e0b;
-    --blue: #3b82f6;
 }
 
 body {
-    background: var(--bg);
+    background: var(--bg-page);
     color: var(--text-body);
     font-family: 'Inter', sans-serif;
     display: flex;
@@ -54,12 +46,12 @@ body {
 }
 
 /* ===== SIDEBAR ===== */
-.app-container { display: flex; width: 100vw; min-height: 100vh; }
+.app-container { display: flex; width: 100vw; min-height: 100vh; position: relative; }
 
 .sidebar {
     width: var(--sidebar-w);
-    background: #0f0a28;
-    border-right: 1px solid rgba(255,255,255,0.05);
+    background: #0d0924;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,6 +59,7 @@ body {
     flex-shrink: 0;
     justify-content: space-between;
     position: sticky; top: 0; height: 100vh;
+    z-index: 20;
 }
 .sidebar-brand {
     width: 40px; height: 40px;
@@ -74,7 +67,7 @@ body {
     background: linear-gradient(135deg, #a855f7, #6366f1);
     display: flex; align-items: center; justify-content: center;
     color: #fff;
-    box-shadow: 0 6px 20px rgba(168,85,247,0.4);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
     margin-bottom: 24px;
 }
 .sidebar-brand svg { width: 20px; height: 20px; }
@@ -88,196 +81,293 @@ body {
 }
 .sidebar-item svg { width: 18px; height: 18px; }
 .sidebar-item span { font-size: 9px; font-weight: 600; }
-.sidebar-item:hover { color: #a78bfa; background: rgba(168,85,247,0.1); }
-.sidebar-item.active { color: #fff; background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.3); }
+.sidebar-item:hover { color: #a78bfa; background: rgba(168, 85, 247, 0.1); }
+.sidebar-item.active { color: #fff; background: rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.3); }
 .sidebar-footer { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .s-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
 .s-label { font-size: 8px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .06em; }
 
-/* ===== MAIN CONTENT ===== */
+/* ===== MAIN CONTENT WRAPPER ===== */
 .main-wrapper {
     flex: 1;
-    padding: 20px 24px 32px;
-    display: flex; flex-direction: column; gap: 18px;
+    padding: 24px 28px 36px;
+    display: flex; flex-direction: column; gap: 20px;
     overflow-y: auto; max-height: 100vh;
-    background: var(--bg);
+    background: radial-gradient(ellipse at 88% 0%, #ded3fc 0%, #ede6fd 32%, #f6f3fe 68%, #f6f3fe 100%);
+    position: relative;
 }
-.main-wrapper::-webkit-scrollbar { width: 4px; }
-.main-wrapper::-webkit-scrollbar-thumb { background: var(--purple-100); border-radius: 4px; }
+.main-wrapper::-webkit-scrollbar { width: 5px; }
+.main-wrapper::-webkit-scrollbar-thumb { background: #ddd6fe; border-radius: 4px; }
+
+/* ===== BACKGROUND DECORATIVE WAVES ===== */
+.bg-decorative-waves {
+    position: absolute;
+    top: 0; right: 0;
+    width: 65%;
+    max-width: 950px;
+    height: 260px;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.bg-decorative-waves svg {
+    width: 100%;
+    height: 100%;
+}
+
+.content-layer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
 /* ===== PAGE HEADER ===== */
 .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 4px;
 }
-.brand-row { display: flex; align-items: center; gap: 12px; }
+.brand-row { display: flex; align-items: center; gap: 14px; }
 .brand-icon-wrap {
-    width: 42px; height: 42px;
+    width: 44px; height: 44px;
     border-radius: 12px;
     background: linear-gradient(135deg, #7c3aed, #a78bfa);
     display: flex; align-items: center; justify-content: center;
     color: #fff;
-    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
     flex-shrink: 0;
 }
-.brand-icon-wrap svg { width: 20px; height: 20px; }
-.brand-title { font-size: 20px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; letter-spacing: -.02em; }
-.brand-sub { font-size: 11px; color: var(--text-gray); margin-top: 1px; }
-.header-right { display: flex; align-items: center; gap: 8px; }
+.brand-icon-wrap svg { width: 22px; height: 22px; }
+.brand-title { font-size: 20px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit', sans-serif; letter-spacing: -.02em; }
+.brand-sub { font-size: 11px; color: var(--text-gray); margin-top: 2px; }
+
+.header-right { display: flex; align-items: center; gap: 10px; }
 .date-pill {
-    display: flex; align-items: center; gap: 7px;
-    background: var(--card); border: 1px solid var(--border-gray);
-    border-radius: 10px; padding: 7px 14px;
-    font-size: 12px; font-weight: 600; color: var(--text-body);
+    display: flex; align-items: center; gap: 8px;
+    background: #ffffff;
+    border: 1px solid rgba(229, 231, 235, 0.9);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 12px; font-weight: 600; color: var(--text-dark);
     cursor: pointer; transition: var(--transition);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .date-pill:hover { border-color: var(--purple); color: var(--purple); }
-.date-pill i { font-size: 14px; color: var(--purple); }
-.hdr-btn {
-    width: 36px; height: 36px;
-    background: var(--card); border: 1px solid var(--border-gray);
-    border-radius: 10px; cursor: pointer;
+.date-pill i { font-size: 15px; color: var(--text-gray); }
+.date-pill .arrow-down { font-size: 12px; color: var(--text-muted); }
+
+.hdr-btn-circle {
+    width: 38px; height: 38px;
+    background: #ffffff;
+    border: 1px solid rgba(229, 231, 235, 0.9);
+    border-radius: 50%;
+    cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     color: var(--text-gray); font-size: 17px;
-    box-shadow: var(--shadow-sm); transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: var(--transition);
+    position: relative;
 }
-.hdr-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-50); }
-.hdr-btn.refresh { background: var(--purple-100); border-color: rgba(124,58,237,0.25); color: var(--purple); }
-.hdr-btn.refresh:hover { background: var(--purple); color: #fff; }
+.hdr-btn-circle:hover { border-color: var(--purple); color: var(--purple); transform: translateY(-1px); }
+.hdr-btn-circle .notif-dot {
+    position: absolute; top: 8px; right: 8px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #ef4444; border: 1.5px solid #fff;
+}
+.hdr-btn-circle.refresh {
+    background: #ede9fe; border-color: rgba(124, 58, 237, 0.25); color: var(--purple);
+}
+.hdr-btn-circle.refresh:hover { background: var(--purple); color: #fff; }
 
-/* ===== STAT CARDS ===== */
-.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+/* ===== 4 BENTO STAT CARDS ===== */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 
 .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border-gray);
     border-radius: var(--radius);
-    padding: 18px 20px;
+    padding: 20px 22px;
     display: flex; align-items: flex-start;
     justify-content: space-between; gap: 10px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-card);
     transition: var(--transition);
     overflow: hidden;
     position: relative;
 }
-.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--border); }
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+/* Card 1: SKU Missing */
+.stat-card.card-sku {
+    background: linear-gradient(135deg, #ffffff 58%, #fff0f3 100%);
+    border: 1px solid rgba(244, 63, 94, 0.15);
+}
+/* Card 2: Tiền Thất Thoát */
+.stat-card.card-money {
+    background: linear-gradient(135deg, #ffffff 58%, #f5f0ff 100%);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+}
+/* Card 3: Ngày Peak */
+.stat-card.card-date {
+    background: linear-gradient(135deg, #ffffff 58%, #edfbf6 100%);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+/* Card 4: Ca Peak */
+.stat-card.card-shift {
+    background: linear-gradient(135deg, #ffffff 58%, #f0f6ff 100%);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+}
 
 .stat-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; flex: 1; }
 .stat-icon {
     width: 40px; height: 40px; flex-shrink: 0;
-    border-radius: 11px;
+    border-radius: 12px;
     display: flex; align-items: center; justify-content: center; font-size: 18px;
 }
 .stat-icon svg { width: 18px; height: 18px; }
-.stat-icon.c-red    { background: #fef2f2; color: #ef4444; border: 1.5px solid #fecaca; }
-.stat-icon.c-purple { background: var(--purple-100); color: var(--purple); border: 1.5px solid #c4b5fd; }
-.stat-icon.c-blue   { background: #eff6ff; color: #3b82f6; border: 1.5px solid #bfdbfe; }
-.stat-icon.c-teal   { background: #f0fdfa; color: #0d9488; border: 1.5px solid #99f6e4; }
+.stat-icon.c-red    { background: #ffe4e6; color: #ef4444; }
+.stat-icon.c-purple { background: #ede9fe; color: #7c3aed; }
+.stat-icon.c-green  { background: #dcfce7; color: #10b981; }
+.stat-icon.c-blue   { background: #dbeafe; color: #3b82f6; }
 
 .stat-text { min-width: 0; }
-.stat-label { font-size: 10px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; white-space: nowrap; }
-.stat-value { font-size: 26px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-label { font-size: 11px; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; white-space: nowrap; }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit', sans-serif; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .stat-value.sm { font-size: 20px; }
 .stat-value.xs { font-size: 17px; }
-.stat-trend { display: flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 10px; font-weight: 600; }
+
+.stat-trend { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 10px; font-weight: 600; }
 .stat-trend.up-red   { color: #ef4444; }
 .stat-trend.up-green { color: #10b981; }
 .stat-trend.info     { color: #3b82f6; }
-.stat-trend.purple   { color: var(--purple); }
+.stat-trend.purple   { color: #7c3aed; }
 
-.stat-mini { flex-shrink: 0; display: flex; align-items: flex-end; }
-.stat-mini svg { opacity: 0.7; }
+.stat-mini { flex-shrink: 0; display: flex; align-items: flex-end; align-self: flex-end; }
+
+/* 3D-like Mini Calendar for Card 3 */
+.calendar-mini-box {
+    width: 48px; height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e6fffa 0%, #ccfbf1 100%);
+    border: 1.5px solid #99f6e4;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(45, 212, 191, 0.2);
+    gap: 3px;
+    padding: 4px;
+}
+.cal-dots-row { display: flex; gap: 4px; }
+.cal-dot { width: 4px; height: 4px; border-radius: 50%; background: #0d9488; opacity: 0.6; }
+.cal-dot.active { background: #0d9488; opacity: 1; }
+
+/* 3 Mini Bars for Card 4 */
+.bars-mini-box {
+    display: flex; align-items: flex-end; gap: 4px; height: 38px;
+}
+.b-bar {
+    width: 7px; border-radius: 4px;
+    background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 100%);
+}
+.b-bar.b1 { height: 16px; opacity: 0.6; }
+.b-bar.b2 { height: 34px; background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); }
+.b-bar.b3 { height: 22px; opacity: 0.8; }
 
 /* ===== CARDS SHARED ===== */
 .card {
     background: var(--card);
-    border: 1px solid var(--border-gray);
+    border: 1px solid rgba(229, 231, 235, 0.85);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-card);
     overflow: hidden;
     transition: var(--transition);
 }
-.card:hover { box-shadow: var(--shadow-md); border-color: var(--border); }
+.card:hover { box-shadow: var(--shadow-hover); }
 
 .card-hdr {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 20px 12px;
-    border-bottom: 1px solid var(--border-gray);
+    padding: 16px 22px 14px;
+    border-bottom: 1px solid #f3f4f6;
 }
 .card-title {
-    font-size: 13px; font-weight: 700; color: var(--text-dark);
-    display: flex; align-items: center; gap: 7px;
+    font-size: 13.5px; font-weight: 700; color: var(--text-dark);
+    display: flex; align-items: center; gap: 8px;
     font-family: 'Outfit', sans-serif;
 }
 .card-title i { color: var(--purple); font-size: 16px; }
-.card-body { padding: 16px 20px 20px; }
+.card-body { padding: 18px 22px 22px; }
 
 /* ===== TOGGLE BUTTONS ===== */
 .toggle-pill {
     display: flex; gap: 2px;
-    background: var(--purple-50);
-    border: 1px solid var(--border);
+    background: #f5f3ff;
+    border: 1px solid #ede9fe;
     border-radius: 10px; padding: 2px;
 }
 .t-btn {
     background: transparent; border: none;
-    padding: 5px 12px; border-radius: 8px;
+    padding: 5px 14px; border-radius: 8px;
     font-size: 11px; font-weight: 700;
     cursor: pointer; transition: var(--transition);
     color: var(--text-gray);
 }
-.t-btn.active { background: var(--purple); color: #fff; box-shadow: 0 2px 8px rgba(124,58,237,0.3); }
-.t-btn:not(.active):hover { color: var(--purple); background: var(--purple-100); }
+.t-btn.active { background: var(--purple); color: #fff; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3); }
+.t-btn:not(.active):hover { color: var(--purple); background: #ede9fe; }
+
+/* Unit Pill on Donut Header */
+.unit-pill {
+    font-size: 11px; color: var(--text-gray);
+    background: #fff; border: 1px solid var(--border-gray);
+    padding: 4px 10px; border-radius: 8px;
+    display: flex; align-items: center; gap: 4px;
+}
 
 /* ===== CHARTS GRID ===== */
-.charts-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 14px; }
+.charts-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
 
 .chart-wrap { position: relative; height: 260px; }
-.donut-container { position: relative; height: 240px; display: flex; align-items: center; justify-content: center; }
+.donut-container { position: relative; height: 230px; display: flex; align-items: center; justify-content: center; }
 .donut-center {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     text-align: center; pointer-events: none; z-index: 1;
 }
 .donut-center .dc-label { font-size: 11px; color: var(--text-gray); font-weight: 600; }
-.donut-center .dc-pct { font-size: 22px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; line-height: 1.1; }
+.donut-center .dc-pct { font-size: 22px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit', sans-serif; line-height: 1.1; }
 
 .shift-legend {
-    display: flex; justify-content: center; gap: 20px;
+    display: flex; justify-content: center; gap: 24px;
     padding: 12px 20px 4px;
-    border-top: 1px solid var(--border-gray);
+    border-top: 1px solid #f3f4f6;
 }
 .legend-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .legend-dot-row { display: flex; align-items: center; gap: 5px; }
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-name { font-size: 10px; color: var(--text-gray); }
-.legend-pct { font-size: 15px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { font-size: 10px; color: var(--text-gray); font-weight: 500; }
+.legend-pct { font-size: 15px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit', sans-serif; }
 
 /* ===== SHELF TABLES ===== */
-.shelf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.shelf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 .shelf-hdr {
     display: flex; align-items: center; gap: 10px;
-    padding: 12px 18px;
-    border-bottom: 1px solid var(--border-gray);
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f4f6;
 }
 .shelf-icon-box {
-    width: 30px; height: 30px; border-radius: 9px;
+    width: 32px; height: 32px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0;
+    font-size: 16px; flex-shrink: 0;
 }
-.shelf-icon-box.pa  { background: var(--purple-100); color: var(--purple); border: 1px solid #c4b5fd; }
-.shelf-icon-box.xam { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
-.shelf-name { font-size: 14px; font-weight: 700; color: var(--text-dark); font-family: 'Outfit',sans-serif; flex: 1; }
+.shelf-icon-box.pa  { background: #ede9fe; color: #7c3aed; }
+.shelf-icon-box.xam { background: #ede9fe; color: #7c3aed; }
+.shelf-name { font-size: 14.5px; font-weight: 700; color: var(--text-dark); font-family: 'Outfit', sans-serif; flex: 1; }
+
 .btn-see-all {
     background: var(--purple); color: #fff;
-    border: none; border-radius: 8px;
-    padding: 5px 12px; font-size: 11px; font-weight: 700;
+    border: none; border-radius: 18px;
+    padding: 5px 14px; font-size: 11px; font-weight: 700;
     cursor: pointer; transition: var(--transition);
     white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.28);
 }
 .btn-see-all:hover { background: #6d28d9; transform: translateX(2px); }
 
@@ -287,31 +377,31 @@ body {
 .shelf-tbl colgroup col:nth-child(3) { width: 18%; }
 
 .shelf-tbl thead tr {
-    background: #fafafa;
-    border-bottom: 1px solid var(--border-gray);
+    background: #fbfaff;
+    border-bottom: 1px solid #f3f4f6;
 }
 .shelf-tbl th {
-    padding: 8px 12px;
+    padding: 9px 16px;
     font-size: 10px; font-weight: 700;
     color: var(--text-gray); text-transform: uppercase; letter-spacing: .06em;
     white-space: nowrap;
 }
 .shelf-tbl th:last-child { text-align: right; }
 .shelf-tbl td {
-    padding: 9px 12px;
+    padding: 10px 16px;
     font-size: 12px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f8f7fd;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     vertical-align: middle;
 }
 .shelf-tbl tbody tr:last-child td { border-bottom: none; }
-.shelf-tbl tbody tr:hover { background: var(--purple-50); }
+.shelf-tbl tbody tr:hover { background: #faf8ff; }
 .shelf-tbl tbody tr { transition: background .15s; }
 
-.td-sku  { font-family: monospace; font-size: 11px; color: var(--purple); font-weight: 600; }
+.td-sku  { font-family: monospace; font-size: 11.5px; color: var(--text-dark); font-weight: 700; }
 .td-name { color: var(--text-body); }
-.td-qty  { text-align: right; font-weight: 800; color: var(--text-dark); font-family: 'Outfit',sans-serif; font-size: 13px; }
-.empty-cell { text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px; }
+.td-qty  { text-align: right; font-weight: 800; color: var(--text-dark); font-family: 'Outfit', sans-serif; font-size: 13px; }
+.empty-cell { text-align: center; padding: 26px; color: var(--text-muted); font-size: 12px; }
 
 /* ===== STATUS BANNER ===== */
 #statusBanner {
@@ -322,7 +412,7 @@ body {
     display: flex; align-items: center; gap: 10px;
     background: var(--card); border: 1px solid var(--border);
     border-radius: 12px; padding: 10px 20px;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     font-size: 13px; font-weight: 600; color: var(--text-body);
 }
 .banner.loading i { color: var(--purple); }
@@ -330,14 +420,14 @@ body {
 /* ===== MODAL ===== */
 .modal-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(15,10,40,0.6); backdrop-filter: blur(4px);
+    background: rgba(15, 10, 40, 0.55); backdrop-filter: blur(4px);
     z-index: 1000; align-items: center; justify-content: center;
 }
 .modal-overlay.active { display: flex; }
 .modal-box {
     background: var(--card); border-radius: 20px;
     padding: 28px; position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
     max-height: 90vh; display: flex; flex-direction: column;
 }
 .modal-close {
@@ -348,7 +438,7 @@ body {
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; transition: var(--transition);
 }
-.modal-close:hover { background: #fee2e2; color: var(--red); border-color: #fecaca; }
+.modal-close:hover { background: #fee2e2; color: #ef4444; border-color: #fecaca; }
 .modal-header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 .modal-body { flex: 1; overflow-y: auto; }
 
@@ -363,7 +453,7 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
     .charts-grid { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 700px) {
     .shelf-grid { grid-template-columns: 1fr; }
@@ -406,231 +496,279 @@ body {
     <!-- ===== MAIN CONTENT ===== -->
     <main class="main-wrapper">
 
-        <!-- Header -->
-        <div class="page-header">
-            <div class="brand-row">
-                <div class="brand-icon-wrap"><i data-lucide="box"></i></div>
-                <div>
-                    <div class="brand-title">Báo Cáo Missing &amp; Chênh Lệch</div>
-                    <div class="brand-sub">Phân tích báo cáo chênh lệch tồn kho</div>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="date-pill"><i class='bx bx-calendar'></i> <span id="headerDateLabel">Đang tải...</span></div>
-                <button class="hdr-btn theme-toggle" id="themeToggle" title="Chế độ sáng/tối"><i class='bx bx-sun'></i></button>
-                <button class="hdr-btn" onclick="openPageNavigator()" title="Chuyển trang"><i class='bx bx-layer'></i></button>
-                <button class="hdr-btn refresh" id="refreshBtn" title="Làm mới dữ liệu"><i class='bx bx-refresh'></i></button>
-            </div>
+        <!-- DECORATIVE BACKGROUND FLUID WAVES (Top-right as in reference image) -->
+        <div class="bg-decorative-waves">
+            <svg viewBox="0 0 1000 280" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Deep smooth wave -->
+                <path d="M200 0 C420 80, 600 20, 780 75 C890 110, 960 70, 1000 45 L1000 0 Z" fill="#e5dcfe" opacity="0.55"/>
+                <!-- Prominent wave swoop across header -->
+                <path d="M380 0 C540 100, 720 35, 870 110 C935 145, 980 130, 1000 105 L1000 0 Z" fill="#ddd2fc" opacity="0.65"/>
+                <!-- Upper right accent layer -->
+                <path d="M580 0 C700 65, 830 40, 940 85 L1000 70 L1000 0 Z" fill="#cfbdfb" opacity="0.5"/>
+            </svg>
         </div>
 
-        <!-- Stat Cards -->
-        <div class="stats-grid">
+        <div class="content-layer">
 
-            <!-- Card 1: SKU Missing -->
-            <div class="stat-card">
-                <div class="stat-left">
-                    <div class="stat-icon c-red"><i data-lucide="package-x"></i></div>
-                    <div class="stat-text">
-                        <div class="stat-label">Tổng SKU Missing</div>
-                        <div class="stat-value" id="statTotalSkus">–</div>
-                        <div class="stat-trend up-red">
-                            <i class='bx bx-trending-up'></i>
-                            <span>Mặt hàng có chênh lệch âm</span>
-                        </div>
+            <!-- Header -->
+            <div class="page-header">
+                <div class="brand-row">
+                    <div class="brand-icon-wrap"><i data-lucide="box"></i></div>
+                    <div>
+                        <div class="brand-title">Báo Cáo Missing &amp; Chênh Lệch</div>
+                        <div class="brand-sub">Phân tích báo cáo chênh lệch tồn kho</div>
                     </div>
                 </div>
-                <div class="stat-mini">
-                    <svg width="72" height="40" viewBox="0 0 72 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 32 Q10 28 16 20 Q22 12 28 18 Q34 24 40 10 Q46 2 52 8 Q58 14 64 6 Q68 2 70 4" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                        <path d="M2 32 Q10 28 16 20 Q22 12 28 18 Q34 24 40 10 Q46 2 52 8 Q58 14 64 6 Q68 2 70 4 L70 40 L2 40 Z" fill="url(#redGrad)" opacity=".2"/>
-                        <defs><linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs>
-                    </svg>
+                <div class="header-right">
+                    <div class="date-pill">
+                        <i class='bx bx-calendar'></i>
+                        <span id="headerDateLabel">Tháng 10/2026</span>
+                        <i class='bx bx-chevron-down arrow-down'></i>
+                    </div>
+                    <button class="hdr-btn-circle" title="Thông báo">
+                        <i class='bx bx-bell'></i>
+                        <span class="notif-dot"></span>
+                    </button>
+                    <button class="hdr-btn-circle theme-toggle" id="themeToggle" title="Chế độ sáng/tối">
+                        <i class='bx bx-sun'></i>
+                    </button>
+                    <button class="hdr-btn-circle" onclick="openPageNavigator()" title="Chuyển trang">
+                        <i class='bx bx-layer'></i>
+                    </button>
+                    <button class="hdr-btn-circle refresh" id="refreshBtn" title="Làm mới dữ liệu">
+                        <i class='bx bx-refresh'></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- Card 2: Tiền Thất Thoát -->
-            <div class="stat-card">
-                <div class="stat-left">
-                    <div class="stat-icon c-purple"><i data-lucide="coins"></i></div>
-                    <div class="stat-text">
-                        <div class="stat-label">Tổng Tiền Thất Thoát</div>
-                        <div class="stat-value xs" id="statTotalMoney">–</div>
-                        <div class="stat-trend up-green">
-                            <i class='bx bx-trending-up'></i>
-                            <span>Ước tính giá trị chênh lệch</span>
+            <!-- 4 Bento Stat Cards -->
+            <div class="stats-grid">
+
+                <!-- Card 1: SKU Missing -->
+                <div class="stat-card card-sku">
+                    <div class="stat-left">
+                        <div class="stat-icon c-red"><i data-lucide="package-x"></i></div>
+                        <div class="stat-text">
+                            <div class="stat-label">Tổng SKU Missing</div>
+                            <div class="stat-value" id="statTotalSkus">529</div>
+                            <div class="stat-trend up-red">
+                                <i class='bx bx-up-arrow-alt'></i>
+                                <span>▲ +12% so với tháng trước</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-mini">
+                        <svg width="78" height="42" viewBox="0 0 78 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 34 Q12 28 18 20 Q24 12 30 18 Q36 24 42 10 Q48 2 54 8 Q60 14 66 6 Q72 2 76 5" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                            <path d="M2 34 Q12 28 18 20 Q24 12 30 18 Q36 24 42 10 Q48 2 54 8 Q60 14 66 6 Q72 2 76 5 L76 42 L2 42 Z" fill="url(#pinkArea)" opacity="0.3"/>
+                            <defs>
+                                <linearGradient id="pinkArea" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#f43f5e"/>
+                                    <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 2: Tiền Thất Thoát -->
+                <div class="stat-card card-money">
+                    <div class="stat-left">
+                        <div class="stat-icon c-purple"><i data-lucide="arrow-left-right"></i></div>
+                        <div class="stat-text">
+                            <div class="stat-label">Tổng Tiền Thất Thoát</div>
+                            <div class="stat-value xs" id="statTotalMoney">–</div>
+                            <div class="stat-trend up-red">
+                                <i class='bx bx-up-arrow-alt'></i>
+                                <span>▲ +8% so với tháng trước</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-mini">
+                        <svg width="78" height="42" viewBox="0 0 78 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 32 Q14 28 20 24 Q28 18 34 22 Q40 26 48 14 Q54 4 60 10 Q68 18 76 8" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                            <path d="M2 32 Q14 28 20 24 Q28 18 34 22 Q40 26 48 14 Q54 4 60 10 Q68 18 76 8 L76 42 L2 42 Z" fill="url(#purpArea)" opacity="0.25"/>
+                            <defs>
+                                <linearGradient id="purpArea" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#8b5cf6"/>
+                                    <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 3: Ngày Bị Kiểm Nhất -->
+                <div class="stat-card card-date">
+                    <div class="stat-left">
+                        <div class="stat-icon c-green"><i data-lucide="calendar-check"></i></div>
+                        <div class="stat-text">
+                            <div class="stat-label">Ngày Bị Kiểm Nhất</div>
+                            <div class="stat-value sm" id="statPeakDate">–</div>
+                            <div class="stat-trend up-green" id="statPeakDateDesc">
+                                <i class='bx bx-up-arrow-alt'></i>
+                                <span>▲ Đúng tiến độ</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="calendar-mini-box">
+                            <div style="font-size:9px; font-weight:800; color:#0d9488; text-transform:uppercase; letter-spacing:0.04em;">OCT</div>
+                            <div class="cal-dots-row">
+                                <div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot active"></div><div class="cal-dot"></div>
+                            </div>
+                            <div class="cal-dots-row">
+                                <div class="cal-dot"></div><div class="cal-dot active"></div><div class="cal-dot"></div><div class="cal-dot"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="stat-mini">
-                    <svg width="72" height="40" viewBox="0 0 72 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 30 Q12 26 18 22 Q26 16 32 20 Q38 24 44 12 Q50 4 56 10 Q62 16 68 8" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                        <path d="M2 30 Q12 26 18 22 Q26 16 32 20 Q38 24 44 12 Q50 4 56 10 Q62 16 68 8 L68 40 L2 40 Z" fill="url(#purpGrad)" opacity=".18"/>
-                        <defs><linearGradient id="purpGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient></defs>
-                    </svg>
-                </div>
-            </div>
 
-            <!-- Card 3: Ngày Peak -->
-            <div class="stat-card">
-                <div class="stat-left">
-                    <div class="stat-icon c-blue"><i data-lucide="calendar-check"></i></div>
-                    <div class="stat-text">
-                        <div class="stat-label">Ngày Bị Nhiều Nhất</div>
-                        <div class="stat-value sm" id="statPeakDate">–</div>
-                        <div class="stat-trend info" id="statPeakDateDesc">
-                            <i class='bx bx-up-arrow-alt'></i>
-                            <span>Lớn nhất trong tháng</span>
+                <!-- Card 4: Ca Bị Nhiều Nhất -->
+                <div class="stat-card card-shift">
+                    <div class="stat-left">
+                        <div class="stat-icon c-blue"><i data-lucide="shield-check"></i></div>
+                        <div class="stat-text">
+                            <div class="stat-label">Ca Bị Nhiều Nhất</div>
+                            <div class="stat-value sm" id="statPeakShift">–</div>
+                            <div class="stat-trend info" id="statPeakShiftDesc">
+                                <span>Chiếm 63.3% tổng số lượng missing</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="bars-mini-box">
+                            <div class="b-bar b1"></div>
+                            <div class="b-bar b2"></div>
+                            <div class="b-bar b3"></div>
                         </div>
                     </div>
                 </div>
-                <div class="stat-mini" style="align-items:center;">
-                    <div style="width:48px;height:48px;border-radius:12px;background:#eff6ff;border:1.5px solid #bfdbfe;display:flex;align-items:center;justify-content:center;">
-                        <i class='bx bx-calendar-alt' style="font-size:22px;color:#3b82f6;"></i>
-                    </div>
-                </div>
+
             </div>
 
-            <!-- Card 4: Ca Peak -->
-            <div class="stat-card">
-                <div class="stat-left">
-                    <div class="stat-icon c-teal"><i data-lucide="clock"></i></div>
-                    <div class="stat-text">
-                        <div class="stat-label">Ca Bị Nhiều Nhất</div>
-                        <div class="stat-value sm" id="statPeakShift">–</div>
-                        <div class="stat-trend purple" id="statPeakShiftDesc">
+            <!-- Charts -->
+            <div class="charts-grid">
+
+                <!-- Bar Chart -->
+                <div class="card">
+                    <div class="card-hdr">
+                        <div class="card-title">
                             <i class='bx bx-bar-chart-alt-2'></i>
-                            <span>Tỷ lệ chênh lệch theo ca</span>
+                            Biểu đồ phân tích theo ngày
+                        </div>
+                        <div class="toggle-pill">
+                            <button id="btnChartModeQty" class="t-btn active" onclick="setChartMode('qty')">Số lượng</button>
+                            <button id="btnChartModeAmt" class="t-btn" onclick="setChartMode('amt')">Giá trị</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Donut Chart -->
+                <div class="card" style="display:flex; flex-direction:column;">
+                    <div class="card-hdr">
+                        <div class="card-title">
+                            <i class='bx bx-pie-chart-alt-2'></i>
+                            Tỷ lệ Missing theo ca
+                        </div>
+                        <div class="unit-pill" id="shiftUnitLabel">
+                            <span>Theo lượng chênh lệch</span>
+                            <i class='bx bx-chevron-down' style="font-size:12px;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body" style="flex:1; padding-bottom:0;">
+                        <div class="donut-container">
+                            <div class="donut-center">
+                                <div class="dc-label">Tổng</div>
+                                <div class="dc-pct">100%</div>
+                            </div>
+                            <canvas id="shiftChart" style="max-height:220px; max-width:220px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="shift-legend" id="shiftLegend">
+                        <div class="legend-item">
+                            <div class="legend-dot-row">
+                                <div class="legend-dot" style="background:#7c3aed;"></div>
+                                <span class="legend-name">Ca 1 (06h - 14h)</span>
+                            </div>
+                            <div class="legend-pct" id="legendPct1">63.3%</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot-row">
+                                <div class="legend-dot" style="background:#f59e0b;"></div>
+                                <span class="legend-name">Ca 2 (14h - 22h)</span>
+                            </div>
+                            <div class="legend-pct" id="legendPct2">27.1%</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot-row">
+                                <div class="legend-dot" style="background:#ef4444;"></div>
+                                <span class="legend-name">Ca 3 (22h - 06h)</span>
+                            </div>
+                            <div class="legend-pct" id="legendPct3">9.6%</div>
                         </div>
                     </div>
                 </div>
-                <div class="stat-mini" style="align-items:flex-end; gap:3px; padding-bottom:4px;">
-                    <svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="0"  y="20" width="10" height="16" rx="3" fill="#c4b5fd"/>
-                        <rect x="15" y="8"  width="10" height="28" rx="3" fill="#7c3aed"/>
-                        <rect x="30" y="14" width="10" height="22" rx="3" fill="#a78bfa"/>
-                    </svg>
-                </div>
+
             </div>
 
-        </div>
+            <!-- Hidden topProductsList for JS compatibility -->
+            <div id="topProductsList" style="display:none;"></div>
 
-        <!-- Charts -->
-        <div class="charts-grid">
+            <!-- Shelf Tables -->
+            <div class="shelf-grid">
 
-            <!-- Bar Chart -->
-            <div class="card">
-                <div class="card-hdr">
-                    <div class="card-title">
-                        <i class='bx bx-bar-chart-alt-2'></i>
-                        Biểu đồ phân tích theo ngày
+                <!-- Kệ Pa -->
+                <div class="card">
+                    <div class="shelf-hdr">
+                        <div class="shelf-icon-box pa"><i class='bx bx-cabinet'></i></div>
+                        <span class="shelf-name">Kệ Pe</span>
+                        <button class="btn-see-all" id="shelfPaSeeAll" onclick="toggleShelfSeeAll(this)" data-tbody-id="shelfPaTableBody" data-expanded="false" style="display:none;">Xem tất cả →</button>
                     </div>
-                    <div class="toggle-pill">
-                        <button id="btnChartModeQty" class="t-btn active" onclick="setChartMode('qty')">Số lượng</button>
-                        <button id="btnChartModeAmt" class="t-btn" onclick="setChartMode('amt')">Giá trị</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
-                </div>
-            </div>
-
-            <!-- Donut Chart -->
-            <div class="card" style="display:flex;flex-direction:column;">
-                <div class="card-hdr">
-                    <div class="card-title">
-                        <i class='bx bx-pie-chart-alt-2'></i>
-                        Tỷ lệ Missing theo ca
-                    </div>
-                    <span id="shiftUnitLabel" style="font-size:11px;color:var(--text-gray);">Theo lượng chênh lệch</span>
-                </div>
-                <div class="card-body" style="flex:1;padding-bottom:0;">
-                    <div class="donut-container">
-                        <div class="donut-center">
-                            <div class="dc-label">Tổng</div>
-                            <div class="dc-pct">100%</div>
-                        </div>
-                        <canvas id="shiftChart" style="max-height:220px;max-width:220px;"></canvas>
+                    <div>
+                        <table class="shelf-tbl">
+                            <colgroup><col><col><col></colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Mã Kệ</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th style="text-align:right;">SL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shelfPaTableBody">
+                                <tr><td class="empty-cell" colspan="3">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="shift-legend" id="shiftLegend">
-                    <div class="legend-item">
-                        <div class="legend-dot-row">
-                            <div class="legend-dot" style="background:#7c3aed;"></div>
-                            <span class="legend-name">Ca 1 (06h–14h)</span>
-                        </div>
-                        <div class="legend-pct" id="legendPct1">–</div>
+
+                <!-- Kệ Xám -->
+                <div class="card">
+                    <div class="shelf-hdr">
+                        <div class="shelf-icon-box xam"><i class='bx bx-cabinet'></i></div>
+                        <span class="shelf-name">Kệ-Xám</span>
+                        <button class="btn-see-all" id="shelfXamSeeAll" onclick="toggleShelfSeeAll(this)" data-tbody-id="shelfXamTableBody" data-expanded="false" style="display:none;">Xem tất cả →</button>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-dot-row">
-                            <div class="legend-dot" style="background:#f59e0b;"></div>
-                            <span class="legend-name">Ca 2 (14h–22h)</span>
-                        </div>
-                        <div class="legend-pct" id="legendPct2">–</div>
+                    <div>
+                        <table class="shelf-tbl">
+                            <colgroup><col><col><col></colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Mã Kệ</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th style="text-align:right;">SL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shelfXamTableBody">
+                                <tr><td class="empty-cell" colspan="3">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-dot-row">
-                            <div class="legend-dot" style="background:#ef4444;"></div>
-                            <span class="legend-name">Ca 3 (22h–06h)</span>
-                        </div>
-                        <div class="legend-pct" id="legendPct3">–</div>
-                    </div>
                 </div>
-            </div>
 
-        </div>
-
-        <!-- Hidden topProductsList for JS compatibility -->
-        <div id="topProductsList" style="display:none;"></div>
-
-        <!-- Shelf Tables -->
-        <div class="shelf-grid">
-
-            <!-- Kệ Pa -->
-            <div class="card">
-                <div class="shelf-hdr">
-                    <div class="shelf-icon-box pa"><i class='bx bx-cabinet'></i></div>
-                    <span class="shelf-name">Kệ Pa</span>
-                    <button class="btn-see-all" id="shelfPaSeeAll" onclick="toggleShelfSeeAll(this)" data-tbody-id="shelfPaTableBody" data-expanded="false" style="display:none;">Xem tất cả →</button>
-                </div>
-                <div>
-                    <table class="shelf-tbl">
-                        <colgroup><col><col><col></colgroup>
-                        <thead>
-                            <tr>
-                                <th>Mã Kệ</th>
-                                <th>Tên Sản Phẩm</th>
-                                <th style="text-align:right;">SL</th>
-                            </tr>
-                        </thead>
-                        <tbody id="shelfPaTableBody">
-                            <tr><td class="empty-cell" colspan="3">Đang tải...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Kệ Xám -->
-            <div class="card">
-                <div class="shelf-hdr">
-                    <div class="shelf-icon-box xam"><i class='bx bx-cabinet'></i></div>
-                    <span class="shelf-name">Kệ-Xám</span>
-                    <button class="btn-see-all" id="shelfXamSeeAll" onclick="toggleShelfSeeAll(this)" data-tbody-id="shelfXamTableBody" data-expanded="false" style="display:none;">Xem tất cả →</button>
-                </div>
-                <div>
-                    <table class="shelf-tbl">
-                        <colgroup><col><col><col></colgroup>
-                        <thead>
-                            <tr>
-                                <th>Mã Kệ</th>
-                                <th>Tên Sản Phẩm</th>
-                                <th style="text-align:right;">SL</th>
-                            </tr>
-                        </thead>
-                        <tbody id="shelfXamTableBody">
-                            <tr><td class="empty-cell" colspan="3">Đang tải...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
         </div>
@@ -648,16 +786,16 @@ body {
 
 <!-- Modal: Daily Detail -->
 <div class="modal-overlay" id="dailyDetailModalOverlay">
-    <div class="modal-box" id="dailyDetailModalBox" style="max-width:860px;width:95%;">
+    <div class="modal-box" id="dailyDetailModalBox" style="max-width:860px; width:95%;">
         <button class="modal-close" id="dailyDetailModalCloseBtn"><i class='bx bx-x'></i></button>
         <div class="modal-header">
-            <h3 style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text-dark);display:flex;align-items:center;gap:10px;">
-                <span style="width:32px;height:32px;border-radius:9px;background:var(--purple-100);border:1.5px solid #c4b5fd;display:flex;align-items:center;justify-content:center;">
-                    <i class='bx bx-calendar-event' style="color:var(--purple);font-size:16px;"></i>
+            <h3 style="font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:800; color:var(--text-dark); display:flex; align-items:center; gap:10px;">
+                <span style="width:32px; height:32px; border-radius:9px; background:var(--purple-100); border:1.5px solid #c4b5fd; display:flex; align-items:center; justify-content:center;">
+                    <i class='bx bx-calendar-event' style="color:var(--purple); font-size:16px;"></i>
                 </span>
                 Chi Tiết Missing Ngày <span id="selectedDateTitle" style="color:var(--purple);">--/--/----</span>
             </h3>
-            <span id="selectedDateSummary" style="font-size:12px;color:var(--text-gray);"></span>
+            <span id="selectedDateSummary" style="font-size:12px; color:var(--text-gray);"></span>
         </div>
         <div class="modal-body">
             <div class="table-responsive">
